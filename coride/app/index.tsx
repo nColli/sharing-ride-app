@@ -1,25 +1,8 @@
-/*import { Button, View } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-export default function Page() {
-  const router = useRouter()
-  const handle = () => {
-    router.navigate('recoverpassword')
-  }
-  return (
-    <View style={{marginTop: 100}}>
-      <Link href="/recoverpassword">About</Link>
-      <Button title='handle' onPress={handle} />
-    </View>
-  );
-}*/
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosResponse } from "axios";
 import { useRouter } from "expo-router"
 import { SetStateAction, useState } from "react"
 import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native"
-
-
 
 export default function Home() {
   const [email, setEmail] = useState('')
@@ -44,8 +27,8 @@ export default function Home() {
     setPassword(text)
   }
 
-  const handleRecoverPassword = () => {
-    router.navigate('recoverpassword')
+  const handleResetPassword = () => {
+    router.navigate('resetpassword')
   }
 
   const handleRegisterAccount = () => {
@@ -68,18 +51,24 @@ export default function Home() {
     return true
   }
 
-  const saveUserData = async (response: AxiosResponse<any, any>) => {
-    const user = response.data.user;
-    const authToken = response.data.token;
+  const saveUserData = async (response: AxiosResponse<any>) => {
+    console.log('response', response);
+    
+    const authToken = response.data.tokenLogin;
 
-    console.log('response', user, authToken);
+    console.log('token', authToken);
 
-    await AsyncStorage.multiSet([
-      ['authToken', authToken],
-      ['userData', JSON.stringify(user)]
-    ]);
+    await AsyncStorage.setItem('authToken', authToken).then(() => {
+      console.log('email saved');
+    }).catch(error => {
+      console.log('error saving email', error);
+    })
 
-    const store = await AsyncStorage.multiGet(['authToken', 'userData'])
+    await AsyncStorage.getItem('authToken').then(t => {console.log('token from async', t)})
+      .catch((error) => {
+        console.log('error getting item', error);
+        return
+      })
   }
 
   const navigateToHome = () => {
@@ -137,7 +126,7 @@ export default function Home() {
         placeholder="Ingresa tu contraseña"
         value={password}
         onChangeText={handlePasswordInput}
-        keyboardType="email-address"
+        keyboardType="default"
         autoCapitalize="none"
         autoCorrect={false}
         secureTextEntry
@@ -146,7 +135,7 @@ export default function Home() {
 
       <Button title="Iniciar Sesión" onPress={handleLogin} />
 
-      <Button title="¿Olvidaste tu contraseña?" onPress={handleRecoverPassword} />
+      <Button title="¿Olvidaste tu contraseña?" onPress={handleResetPassword} />
       <Button title="Registrate acá" onPress={handleRegisterAccount} />
     </View>
   )
@@ -158,6 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#fff',
+    paddingTop: 0
   },
   title: {
     fontSize: 28,
