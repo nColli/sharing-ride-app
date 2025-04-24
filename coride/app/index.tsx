@@ -10,6 +10,12 @@ export default function Home() {
   const [emailError, setEmailError] = useState('Ingresa tu correo electrónico');
   const router = useRouter()
 
+  /*
+  USE EFFECT SI USUARIO ESTA VALIDADO - SEND TO HOME
+
+  */
+
+
   const validateEmail = (text: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
