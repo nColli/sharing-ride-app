@@ -38,7 +38,7 @@ export default function Home() {
   }
 
   const handleRegisterAccount = () => {
-    router.navigate('registeraccount')
+    router.navigate('createaccount')
   }
 
   const isInputValid = () => {
