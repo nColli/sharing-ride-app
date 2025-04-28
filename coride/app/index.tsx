@@ -105,6 +105,7 @@ export default function Home() {
     } catch(error) {
       console.log('error', error);
       
+      Alert.alert('Usuario incorrecto', 'El correo o la contraseña no son correctas')
     }
 
     

@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, Button } from "react-native"
+import { Link } from "expo-router"
 
 export default function Dashboard() {
   const handleRegisterVehicle = () => {
@@ -7,7 +8,7 @@ export default function Dashboard() {
 
   return (
     <View style={styles.container}>
-      <Button title="Registrar vehículo"  />
+      <Link href="home/registervehicle">Registrar vehiculo</Link>
     </View>
   )
 }
