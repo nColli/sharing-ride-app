@@ -4,7 +4,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { useRouter } from 'expo-router';
 
 
 const { width } = Dimensions.get('window');
@@ -13,7 +14,7 @@ const PHOTO_CONTAINER_SIZE = width * 0.4; // 40% del ancho de pantalla
 export default function PhotoUploadScreen() {
   const [photos, setPhotos] = useState<(string | null)[]>([null, null, null]);
   const [uploading, setUploading] = useState(false);
-  let texto = '';
+  const router = useRouter()
 
   const requestPermissions = async () => {
     const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
@@ -24,38 +25,23 @@ export default function PhotoUploadScreen() {
     }
   };
 
-  const handleTakePhoto = async (index: number) => {
+  const handleImageSelection = async (index: number, useCamera: boolean) => {
     await requestPermissions();
     
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['images'],
+    const options: ImagePicker.ImagePickerOptions = {
+      mediaTypes: 'images',
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.7,
-    });
+    };
 
-    if (!result.canceled) {
-      const base64 = await convertUriToBase64(result.assets[0].uri);
+    const result = useCamera 
+      ? await ImagePicker.launchCameraAsync(options)
+      : await ImagePicker.launchImageLibraryAsync(options);
+
+    if (!result.canceled && result.assets[0].uri) {
       const newPhotos = [...photos];
-      newPhotos[index] = base64;
-      setPhotos(newPhotos);
-    }
-  };
-
-  const handleSelectFromGallery = async (index: number) => {
-    await requestPermissions();
-    
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.7,
-    });
-
-    if (!result.canceled) {
-      const base64 = await convertUriToBase64(result.assets[0].uri);
-      const newPhotos = [...photos];
-      newPhotos[index] = base64;
+      newPhotos[index] = result.assets[0].uri;
       setPhotos(newPhotos);
     }
   };
@@ -66,78 +52,99 @@ export default function PhotoUploadScreen() {
     setPhotos(newPhotos);
   };
 
-  const validatePhotos = () => {
-    return photos.every(photo => photo !== null);
-  };
-
-  const convertUriToBase64 = async (uri: string) => {
-    try {
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64
-      });
-      return `data:image/jpeg;base64,${base64}`;
-    } catch (error) {
-      console.error('Error converting URI to Base64:', error);
-      return null;
-    }
-  };
-
-  const createUser = async () => {
-    console.log('creating user');
+  const getUserData = async () => {
+    const dataSaved = await AsyncStorage.multiGet([
+      'email', 'password', 'dni', 'nombre', 
+      'apellido', 'fechaNacimiento', 'calle', 
+      'numero', 'localidad', 'provincia'
+    ]);
     
-    const dni_frente = photos[0];
-    const dni_dorso = photos[1];
-    const selfie = photos[2];
-
-    const dataSaved = await AsyncStorage.multiGet(['email', 'password', 'dni', 'nombre', 'apellido', 'fechaNacimiento', 'calle', 'numero', 'localidad', 'provincia'])
-    console.log('dataSaved', dataSaved);
-
-    console.log('email data', dataSaved[0][1]);
-    
-    const newUser = {
-      email: dataSaved[0][1],
-      password: dataSaved[1][1],
-      dni: dataSaved[2][1],
-      name: dataSaved[3][1],
-      surname: dataSaved[4][1],
-      birthDate: dataSaved[5][1],
-      street: dataSaved[6][1],
-      number: dataSaved[7][1],
-      locality: dataSaved[8][1],
-      province: dataSaved[9][1],
+    return {
+      email: dataSaved[0][1] || '',
+      password: dataSaved[1][1] || '',
+      dni: dataSaved[2][1] || '',
+      name: dataSaved[3][1] || '',
+      surname: dataSaved[4][1] || '',
+      birthDate: dataSaved[5][1] || '',
+      street: dataSaved[6][1] || '',
+      number: dataSaved[7][1] || '',
+      city: dataSaved[8][1] || '',
+      province: dataSaved[9][1] || '',
     };
-    
-    console.log('user sin fotos', newUser);
-    /*
-    newUser['dni_frente'] = dni_frente;
-    newUser['dni_dorso'] = dni_dorso;
-    newUser['selfie'] = selfie;
-    */
-    //crear usuario con email y contraseña - sin token en schema de newUsers
-    //validar si usuario es valido con fotos subidas 
-    //si es valido sacar de newUsers y ponerlo en users
-    //backend - crear nuevo schema de newUser
+  };
 
-    axios
-      .post("https://backend-sharing-ride-app.onrender.com/api/users", newUser)
-      .then((response) => {console.log('user created', response)})
-      .catch((error) => {Alert.alert('Error', 'error al crear el usuario')})
+  const saveUserData = async (response: AxiosResponse<any>) => {
+    const authToken = response.data.tokenLogin;
+
+    console.log('token', authToken);
+
+    await AsyncStorage.setItem('authToken', authToken).then(() => {
+      console.log('email saved');
+    }).catch(error => {
+      console.log('error saving email', error);
+    })
+
+    await AsyncStorage.getItem('authToken').then(t => {console.log('token from async', t)})
+      .catch((error) => {
+        console.log('error getting item', error);
+        return
+      })
   }
 
   const handleUpload = async () => {
-    if (!validatePhotos()) {
-      Alert.alert('Fotos incompletas', 'Debes subir las 3 fotos requeridas');
+    if (!photos.every(photo => photo !== null)) {
+      Alert.alert('Error', 'Debes subir todas las fotos requeridas');
       return;
     }
 
     setUploading(true);
     try {
-      // Logica de subida
-      createUser()
+      const formData = new FormData();
+      const userData = await getUserData();
 
-      //Alert.alert('Éxito', 'Fotos subidas correctamente');
+      // Agregar datos del usuario como JSON
+      formData.append('userData', JSON.stringify(userData));
+
+      // Agregar archivos de imagen
+      formData.append('dni_frente', {
+        uri: photos[0],
+        name: 'dni_frente.jpg',
+        type: 'image/jpeg',
+      } as any);
+
+      formData.append('dni_dorso', {
+        uri: photos[1],
+        name: 'dni_dorso.jpg',
+        type: 'image/jpeg',
+      } as any);
+
+      formData.append('selfie', {
+        uri: photos[2],
+        name: 'selfie.jpg',
+        type: 'image/jpeg',
+      } as any);
+
+      const response = await axios.post(
+        'https://backend-sharing-ride-app.onrender.com/api/users',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      Alert.alert('Éxito', 'Usuario creado y fotos subidas correctamente');
+      console.log('Respuesta del servidor:', response.data);
+
+
+      saveUserData(response)
+
+      router.navigate('../home')
+
     } catch (error) {
-      Alert.alert('Error', 'No se pudieron subir las fotos');
+      console.error('Error:', error);
+      Alert.alert('Error', 'Hubo un problema al crear el usuario');
     } finally {
       setUploading(false);
     }
@@ -151,11 +158,7 @@ export default function PhotoUploadScreen() {
 
         <View style={styles.photosContainer}>
           {photos.map((photo, index) => {
-            let texto = '';
-            index === 1 ? texto = "Frente del DNI" : 
-            index === 2 ? texto = "Dorso del DNI" :
-            index === 3 ? texto = "Selfie" : null
-
+            const labels = ["Frente del DNI", "Dorso del DNI", "Selfie"];
             return (
               <View key={index} style={styles.photoContainer}>
                 {photo ? (
@@ -172,22 +175,22 @@ export default function PhotoUploadScreen() {
                   <View style={styles.photoActions}>
                     <TouchableOpacity 
                       style={styles.actionButton}
-                      onPress={() => handleTakePhoto(index)}
+                      onPress={() => handleImageSelection(index, true)}
                     >
                       <MaterialIcons name="photo-camera" size={32} color="#2c3e50" />
                     </TouchableOpacity>
                     
                     <TouchableOpacity 
                       style={styles.actionButton}
-                      onPress={() => handleSelectFromGallery(index)}
+                      onPress={() => handleImageSelection(index, false)}
                     >
                       <MaterialIcons name="photo-library" size={32} color="#2c3e50" />
                     </TouchableOpacity>
                   </View>
                 )}
-                <Text style={styles.photoLabel}>{texto}</Text>
+                <Text style={styles.photoLabel}>{labels[index]}</Text>
               </View>
-          )})}
+            )})}
         </View>
 
         <View style={styles.buttonContainer}>
