@@ -64,7 +64,7 @@ export default function VehicleRegistration() {
     patente: '',
     marca: '',
     modelo: '',
-    año: '',
+    anio: '',
     capacidad: '',
     kilometros: '',
   });
@@ -80,9 +80,7 @@ export default function VehicleRegistration() {
     const data = new FormData();
     
     // Agregar datos del formulario
-    Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
-    });
+    data.append('vehicleData', JSON.stringify(formData));
 
     // Agregar fotos
     if (seguroFoto) {

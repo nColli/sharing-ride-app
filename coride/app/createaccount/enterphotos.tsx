@@ -136,9 +136,8 @@ export default function PhotoUploadScreen() {
 
       Alert.alert('Éxito', 'Usuario creado y fotos subidas correctamente');
       console.log('Respuesta del servidor:', response.data);
-
-
-      saveUserData(response)
+      
+      await saveUserData(response)
 
       router.navigate('../home')
 
