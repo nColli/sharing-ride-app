@@ -4,8 +4,14 @@ import { useRouter } from "expo-router"
 import { SetStateAction, useState } from "react"
 import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native"
 import { styles } from "../styles";
+import LoginWelcome from "../components/LoginWelcome";
+
+import LoadingOverlay from '../components/LoadingOverlay';
+import useLoading from '../custom_hooks/useLoading';
 
 export default function Home() {
+  const { isLoading, withLoading } = useLoading();
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('Ingresa tu correo electrónico');
@@ -99,8 +105,10 @@ export default function Home() {
     const url = "https://backend-sharing-ride-app.onrender.com/api/login"
 
     try {
-      const response = await axios.post(url, body)
-      saveUserData(response)
+      await withLoading (
+        axios.post(url, body)
+          .then((response) => {saveUserData(response)})
+      );
       navigateToHome()
       
     } catch(error) {
@@ -114,8 +122,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenido a CoRide </Text>
-      <Text style={styles.subtitle}>Tu aplicación para compartir viajes</Text>
+      <LoginWelcome></LoginWelcome>
 
       <Text style={styles.label}>Correo electrónico</Text>
       <TextInput
@@ -152,49 +159,7 @@ export default function Home() {
         <Button title="Registrate acá" onPress={handleRegisterAccount} />
       </View>
       
+      <LoadingOverlay visible={isLoading} />
     </View>
   )
 }
-/*
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-    paddingTop: 0
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#2c3e50',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 40,
-    color: '#7f8c8d',
-  },
-  formContainer: {
-    width: '100%',
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#2c3e50',
-  },
-  input: {
-    height: 50,
-    borderColor: '#bdc3c7',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  button: {
-    padding: 10
-  }
-})*/
