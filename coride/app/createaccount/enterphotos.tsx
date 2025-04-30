@@ -6,6 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosResponse } from 'axios';
 import { useRouter } from 'expo-router';
+import { styles } from '../../styles';
 
 
 const { width } = Dimensions.get('window');
@@ -159,7 +160,7 @@ export default function PhotoUploadScreen() {
           {photos.map((photo, index) => {
             const labels = ["Frente del DNI", "Dorso del DNI", "Selfie"];
             return (
-              <View key={index} style={styles.photoContainer}>
+              <View key={index} style={stylesLocal.photoContainer}>
                 {photo ? (
                   <>
                     <Image source={{ uri: photo }} style={styles.photo} />
@@ -205,71 +206,11 @@ export default function PhotoUploadScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#2c3e50',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#7f8c8d',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  photosContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
+const stylesLocal = StyleSheet.create({
   photoContainer: {
     width: PHOTO_CONTAINER_SIZE,
     height: PHOTO_CONTAINER_SIZE,
     marginBottom: 15,
     overflow: 'hidden', // Previene que el contenido se desborde
-  },
-  photo: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
-  },
-  photoActions: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#bdc3c7',
-    borderRadius: 10,
-    backgroundColor: '#f5f6fa',
-  },
-  actionButton: {
-    padding: 10,
-    marginVertical: 5,
-  },
-  photoLabel: {
-    textAlign: 'center',
-    marginTop: 8,
-    color: '#7f8c8d',
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: '#e74c3c',
-    borderRadius: 15,
-    padding: 5,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    width: '100%'
-  },
-  
+  }
 });

@@ -1,11 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, Button, Alert, Platform, ScrollView } from "react-native";
+import { View, Text, TextInput, Button, Alert, Platform, ScrollView } from "react-native";
 import {Picker} from '@react-native-picker/picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { styles } from "../../styles"
 
-export default function Enterdata() {
+export default function Insertpersonaldata() {
   const [dni, setDni] = useState('')
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -131,8 +132,9 @@ export default function Enterdata() {
   };
 
   const handleSignup = async () => {
-    if (!dni || !nombre || !apellido) {
+    if (!dni || !nombre || !apellido || !fechaNacimiento) {
       Alert.alert('Error', 'Complete todos los campos')
+      return
     }
 
     //despues de registrarse eliminar data critica
@@ -148,10 +150,11 @@ export default function Enterdata() {
 
     router.navigate('createaccount/enterphotos')
   }
-  
+
   return (
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>¡Registra tu cuenta!</Text>
+
         <Text style={styles.label}>DNI</Text>
         <TextInput
           style={styles.input}
@@ -184,27 +187,21 @@ export default function Enterdata() {
           autoCorrect={false}
         />
 
-        {/* Selector de Fecha */}
         <Text style={styles.sectionTitle}>Fecha de Nacimiento</Text>
         <Button 
           title={formatDate(fechaNacimiento)} 
           onPress={() => setShowDatePicker(true)} 
         />
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={fechaNacimiento}
+        <DateTimePickerModal
+            isVisible={showDatePicker}
             mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={onChangeFecha}
-            maximumDate={new Date()} // No permitir fechas futuras
-            locale="es-AR" // Formato argentino
-          />
-        )}
+            onConfirm={onChangeFecha}
+            onCancel={() => setShowDatePicker(false)}
+        />
 
         <Text style={styles.sectionTitle}>Dirección</Text>
 
-        {/* Calle */}
         <Text style={styles.label}>Calle</Text>
         <TextInput
           style={[styles.input, errors.street && styles.errorInput]}
@@ -214,7 +211,6 @@ export default function Enterdata() {
         />
         {errors.street && <Text style={styles.errorText}>{errors.street}</Text>}
 
-        {/* Número */}
         <Text style={styles.label}>Número</Text>
         <TextInput
           style={[styles.input, errors.number && styles.errorInput]}
@@ -225,7 +221,6 @@ export default function Enterdata() {
         />
         {errors.number && <Text style={styles.errorText}>{errors.number}</Text>}
 
-        {/* Localidad */}
         <Text style={styles.label}>Localidad</Text>
         <TextInput
           style={[styles.input, errors.locality && styles.errorInput]}
@@ -235,7 +230,6 @@ export default function Enterdata() {
         />
         {errors.locality && <Text style={styles.errorText}>{errors.locality}</Text>}
 
-        {/* Provincia */}
         <Text style={styles.label}>Provincia</Text>
         <View style={[styles.pickerContainer, errors.province && styles.errorInput]}>
           <Picker
@@ -251,57 +245,7 @@ export default function Enterdata() {
         {errors.province && <Text style={styles.errorText}>{errors.province}</Text>}
 
         <Button title="Continuar" onPress={handleSignup} />
+
       </ScrollView>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    padding: 15,
-    backgroundColor: '#fff',
-    paddingTop: 25
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#2c3e50',
-  },
-  input: {
-    height: 50,
-    borderColor: '#bdc3c7',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 30,
-    color: '#2c3e50',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#2c3e50",
-  },
-  pickerContainer: {
-    borderColor: "#bdc3c7",
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  errorInput: {
-    borderColor: "#e74c3c",
-  },
-  errorText: {
-    color: "#e74c3c",
-    marginBottom: 10,
-    fontSize: 14,
-  },
-});

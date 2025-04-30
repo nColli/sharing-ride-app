@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { useRouter } from "expo-router"
 import { SetStateAction, useState } from "react"
 import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native"
+import { styles } from "../styles";
 
 export default function Home() {
   const [email, setEmail] = useState('')
@@ -139,15 +140,22 @@ export default function Home() {
         secureTextEntry
       />
 
+      <View style={styles.button}>
+        <Button title="Iniciar Sesión" onPress={handleLogin} />
+      </View>
 
-      <Button title="Iniciar Sesión" onPress={handleLogin} />
+      <View style={styles.button}>
+        <Button title="¿Olvidaste tu contraseña?" onPress={handleResetPassword} />
+      </View>
 
-      <Button title="¿Olvidaste tu contraseña?" onPress={handleResetPassword} />
-      <Button title="Registrate acá" onPress={handleRegisterAccount} />
+      <View style={styles.button}>
+        <Button title="Registrate acá" onPress={handleRegisterAccount} />
+      </View>
+      
     </View>
   )
 }
-
+/*
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -186,4 +194,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
   },
-})
+  button: {
+    padding: 10
+  }
+})*/
