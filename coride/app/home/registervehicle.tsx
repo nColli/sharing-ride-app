@@ -6,6 +6,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useLoading from '../../custom_hooks/useLoading';
+
 const PhotoUpload = ({ label, photo, onPhotoChange }: { label: string; photo: string | null; onPhotoChange: (uri: string | null) => void }) => {
   const handleTakePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
@@ -61,6 +64,8 @@ const PhotoUpload = ({ label, photo, onPhotoChange }: { label: string; photo: st
 };
 
 export default function VehicleRegistration() {
+  const { isLoading, withLoading } = useLoading();
+
   const [formData, setFormData] = useState({
     patente: '',
     marca: '',
@@ -113,13 +118,13 @@ export default function VehicleRegistration() {
     const token = await AsyncStorage.getItem('authToken')
 
     try {
-      const response = await axios.post('https://backend-sharing-ride-app.onrender.com/api/vehicles', data, {
+      await withLoading(axios.post('https://backend-sharing-ride-app.onrender.com/api/vehicles', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         },
-      });
-      Alert.alert('Éxito', 'Vehículo registrado correctamente');
+      }))
+      Alert.alert('Vehiculo registrado', 'Vehículo registrado correctamente');
 
       router.navigate("/home")
 
@@ -166,6 +171,8 @@ export default function VehicleRegistration() {
           onPress={handleSubmit}
           color="#2c3e50"
         />
+
+      <LoadingOverlay visible={isLoading} />
       </View>
     </ScrollView>
   );
