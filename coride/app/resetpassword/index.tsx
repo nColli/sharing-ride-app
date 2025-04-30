@@ -3,8 +3,13 @@ import { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Button, Alert } from "react-native";
 import axios from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useLoading from '../../custom_hooks/useLoading';
  
 export default function Resetpassword() {
+  const { isLoading, withLoading } = useLoading();
+
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('Ingresa tu correo electrónico')
 
@@ -36,7 +41,11 @@ export default function Resetpassword() {
     const url = "https://backend-sharing-ride-app.onrender.com/api/resetpassword"
 
     try {
-      const response = await axios.post(url, body)
+      //const response = await axios.post(url, body)
+      await withLoading(
+        axios.post(url, body)
+      )
+
       //console.log('response', response);
       console.log('code send');
       
@@ -82,6 +91,8 @@ export default function Resetpassword() {
         autoCorrect={false}
       />
       <Button title="Enviar Código" onPress={handleSendCode} />
+
+      <LoadingOverlay visible={isLoading} />
     </View>
   );
 }

@@ -4,7 +4,12 @@ import { StyleSheet, View, Text, TextInput, Button, Alert } from "react-native";
 import axios, { AxiosResponse } from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useLoading from '../../custom_hooks/useLoading';
+
 export default function Entercode() {
+  const { isLoading, withLoading } = useLoading();
+
   const [token, setToken] = useState('')
   const [email, setEmail] = useState('');
   const router = useRouter()
@@ -54,8 +59,14 @@ export default function Entercode() {
     console.log('url', URL_TOKEN);
     
     try {
-      const response = await axios.post(URL_TOKEN, body)
-      saveUserData(response)
+      /*const response = await axios.post(URL_TOKEN, body)
+      saveUserData(response)*/
+      await withLoading(
+        axios.post(URL_TOKEN, body)
+          .then((response) => {
+            saveUserData(response)
+          })
+      )
       
       router.navigate('resetpassword/newpassword')
 
@@ -79,6 +90,8 @@ export default function Entercode() {
         autoCorrect={false}
       />
       <Button title="Validar Código" onPress={handleSendToken} />
+
+      <LoadingOverlay visible={isLoading} />
     </View>
   )
 }

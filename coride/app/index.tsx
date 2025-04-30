@@ -151,6 +151,12 @@ export default function Home() {
         <Button title="Iniciar Sesión" onPress={handleLogin} />
       </View>
 
+      <View style={{
+        borderBottomColor: 'black', 
+        borderBottomWidth: StyleSheet.hairlineWidth,
+      }}>
+      </View>
+
       <View style={styles.button}>
         <Button title="¿Olvidaste tu contraseña?" onPress={handleResetPassword} />
       </View>

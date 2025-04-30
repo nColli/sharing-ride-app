@@ -4,7 +4,12 @@ import { router } from "expo-router"
 import axios from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useLoading from '../../custom_hooks/useLoading';
+
 export default function Newpassword() {
+  const { isLoading, withLoading } = useLoading();
+
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
 
@@ -33,13 +38,22 @@ export default function Newpassword() {
     console.log('url', URL, 'token', token);
     
     try {
+
+      await withLoading(
+        axios.put(URL, body, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+      )
+      /*
       const response = await axios.put(URL, body, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-
-      console.log('response', response.data);
+        */
+      console.log('password changed');
 
       goToHome()
 
@@ -80,6 +94,8 @@ export default function Newpassword() {
         secureTextEntry
       />
       <Button title="Registrar contraseña" onPress={handleSendPassword} />
+
+      <LoadingOverlay visible={isLoading} />
     </View>
   )
 }
