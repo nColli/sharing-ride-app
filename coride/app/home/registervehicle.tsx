@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const PhotoUpload = ({ label, photo, onPhotoChange }: { label: string; photo: string | null; onPhotoChange: (uri: string | null) => void }) => {
   const handleTakePhoto = async () => {
@@ -64,7 +65,7 @@ export default function VehicleRegistration() {
     patente: '',
     marca: '',
     modelo: '',
-    anio: '',
+    año: '',
     capacidad: '',
     kilometros: '',
   });
@@ -80,7 +81,16 @@ export default function VehicleRegistration() {
     const data = new FormData();
     
     // Agregar datos del formulario
-    data.append('vehicleData', JSON.stringify(formData));
+    const copyFormData = {
+      patente: formData["patente"],
+      marca: formData["marca"],
+      modelo: formData["modelo"],
+      anio: formData["año"],
+      capacidad: formData["capacidad"],
+      kilometros: formData["kilometros"],
+    }
+
+    data.append('vehicleData', JSON.stringify(copyFormData));
 
     // Agregar fotos
     if (seguroFoto) {
@@ -110,8 +120,11 @@ export default function VehicleRegistration() {
         },
       });
       Alert.alert('Éxito', 'Vehículo registrado correctamente');
+
+      router.navigate("/home")
+
     } catch (error) {
-      Alert.alert('Error', 'Error al registrar el vehículo');
+      Alert.alert('Error', 'Verifique los datos ingresados');
     }
   };
 
