@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, Platform, ScrollView } from "react-native";
+import { View, Text, TextInput, Button, Alert, Platform, ScrollView, Appearance } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { styles } from "../../styles"
@@ -36,10 +36,10 @@ export default function Insertpersonaldata() {
     setApellido(text)
   }
 
-  const onChangeFecha = (event: any, selectedDate?: Date) => {
+  const onChangeFecha = (event: any) => {
     setShowDatePicker(false);
-    if (selectedDate) {
-      setFechaNacimiento(selectedDate);
+    if (event) {
+      setFechaNacimiento(event);
     }
   };
 
@@ -195,9 +195,11 @@ export default function Insertpersonaldata() {
 
         <DateTimePickerModal
             isVisible={showDatePicker}
+            date={fechaNacimiento}
             mode="date"
             onConfirm={onChangeFecha}
             onCancel={() => setShowDatePicker(false)}
+            isDarkModeEnabled={Appearance.getColorScheme() === 'light'}
         />
 
         <Text style={styles.sectionTitle}>Dirección</Text>

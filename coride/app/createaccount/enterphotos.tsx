@@ -8,11 +8,16 @@ import axios, { AxiosResponse } from 'axios';
 import { useRouter } from 'expo-router';
 import { styles } from '../../styles';
 
+import LoadingOverlay from '../../components/LoadingOverlay';
+import useLoading from '../../custom_hooks/useLoading';
+
 
 const { width } = Dimensions.get('window');
 const PHOTO_CONTAINER_SIZE = width * 0.4; // 40% del ancho de pantalla
 
 export default function PhotoUploadScreen() {
+  const { isLoading, withLoading } = useLoading();
+
   const [photos, setPhotos] = useState<(string | null)[]>([null, null, null]);
   const [uploading, setUploading] = useState(false);
   const router = useRouter()
@@ -125,20 +130,21 @@ export default function PhotoUploadScreen() {
         type: 'image/jpeg',
       } as any);
 
-      const response = await axios.post(
-        'https://backend-sharing-ride-app.onrender.com/api/users',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      await withLoading(
+        axios.post(
+          'https://backend-sharing-ride-app.onrender.com/api/users',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        ).then((response) => {
+          saveUserData(response)
+        })
+      )
 
-      Alert.alert('Éxito', 'Usuario creado y fotos subidas correctamente');
-      console.log('Respuesta del servidor:', response.data);
-      
-      await saveUserData(response)
+      Alert.alert('Ya tenes tu cuenta', 'Tu usario ha sido creado, podes empezar a usar la app');
 
       router.navigate('../home')
 
@@ -201,6 +207,8 @@ export default function PhotoUploadScreen() {
             color="#2c3e50"
           />
         </View>
+
+        <LoadingOverlay visible={isLoading} />
       </View>
     </ScrollView>
   );

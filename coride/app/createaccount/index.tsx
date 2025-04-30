@@ -6,7 +6,7 @@ import { styles } from "../../styles";
 
 export default function Createaccount() {
   const [email, setEmail] = useState('')
-  const [emailError, setEmailError] = useState('')
+  const [emailError, setEmailError] = useState('Ingrese el correo')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
 
