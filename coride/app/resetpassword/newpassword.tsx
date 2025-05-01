@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TextInput, Button, Alert } from "react-native"
 import { router } from "expo-router"
 import axios from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { styles } from "../../styles"
 
 import LoadingOverlay from '../../components/LoadingOverlay';
 import useLoading from '../../custom_hooks/useLoading';
@@ -46,13 +47,6 @@ export default function Newpassword() {
           }
         })
       )
-      /*
-      const response = await axios.put(URL, body, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-        */
       console.log('password changed');
 
       goToHome()
@@ -99,34 +93,3 @@ export default function Newpassword() {
     </View>
   )
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    padding: 15,
-    backgroundColor: '#fff',
-    paddingTop: 25
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#2c3e50',
-  },
-  input: {
-    height: 50,
-    borderColor: '#bdc3c7',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 40,
-    color: '#7f8c8d',
-  },
-});
