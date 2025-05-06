@@ -9,6 +9,7 @@ export default function Dashboard() {
   return (
     <View style={styles.container}>
       <Link href="home/registervehicle">Registrar vehiculo</Link>
+      <Link href="home/createregularplace">Registrar lugar habitual</Link>
     </View>
   )
 }
