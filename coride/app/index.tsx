@@ -1,16 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosResponse } from "axios";
 import { useRouter } from "expo-router"
-import { SetStateAction, useState } from "react"
+import { useState } from "react"
 import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native"
 import { styles } from "../styles";
 import LoginWelcome from "../components/LoginWelcome";
 
 import LoadingOverlay from '../components/LoadingOverlay';
 import useLoading from '../custom_hooks/useLoading';
-import { validateEmailAndGetError } from "../utils/validateEmail";
 import InputEmail from "../components/InputEmail";
 import ErrorText from "../components/ErrorText";
+import InputPassword from "../components/InputPassword";
+import saveUserData from "../utils/saveAuthToken";
 
 export default function Home() {
   const { isLoading, withLoading } = useLoading();
@@ -26,18 +27,6 @@ export default function Home() {
 
   */
 
-  const handlePasswordInput = (text: string) => {
-    setPassword(text)
-  }
-
-  const handleResetPassword = () => {
-    router.navigate('resetpassword')
-  }
-
-  const handleRegisterAccount = () => {
-    router.navigate('createaccount')
-  }
-
   const isInputValid = () => {
     console.log('validate login', email, password);
     console.log('errores email', emailError);
@@ -52,26 +41,6 @@ export default function Home() {
     }
 
     return true
-  }
-
-  const saveUserData = async (response: AxiosResponse<any>) => {
-    console.log('response', response);
-    
-    const authToken = response.data.tokenLogin;
-
-    console.log('token', authToken);
-
-    await AsyncStorage.setItem('authToken', authToken).then(() => {
-      console.log('email saved');
-    }).catch(error => {
-      console.log('error saving email', error);
-    })
-
-    await AsyncStorage.getItem('authToken').then(t => {console.log('token from async', t)})
-      .catch((error) => {
-        console.log('error getting item', error);
-        return
-      })
   }
 
   const navigateToHome = () => {
@@ -127,17 +96,10 @@ export default function Home() {
         setEmailError={setEmailError}
       />
 
-      <Text style={styles.label}>Contraseña</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ingresa tu contraseña"
-        value={password}
-        onChangeText={handlePasswordInput}
-        keyboardType="default"
-        autoCapitalize="none"
-        autoCorrect={false}
-        secureTextEntry
-      />
+      <InputPassword
+        password={password}
+        setPassword={setPassword}
+      /> 
 
       <ErrorText error={loginError}/>
       
@@ -152,11 +114,11 @@ export default function Home() {
       </View>
 
       <View style={styles.button}>
-        <Button title="¿Olvidaste tu contraseña?" onPress={handleResetPassword} />
+        <Button title="¿Olvidaste tu contraseña?" onPress={() => router.navigate('resetpassword')} />
       </View>
 
       <View style={styles.button}>
-        <Button title="Registrate acá" onPress={handleRegisterAccount} />
+        <Button title="Registrate acá" onPress={() => router.navigate('createaccount')} />
       </View>
       
       <LoadingOverlay visible={isLoading} />
