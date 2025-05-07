@@ -1,40 +1,20 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { View, Text, TextInput, Button, Alert } from "react-native";
+import { View, Text, Button, Alert } from "react-native";
 import axios from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "../../styles";
 
 import LoadingOverlay from '../../components/LoadingOverlay';
 import useLoading from '../../custom_hooks/useLoading';
-import { validateEmailAndGetError } from "../../utils/validateEmail";
+import InputEmail from "../../components/InputEmail";
+import getURL from "../../utils/url";
  
 export default function Resetpassword() {
   const { isLoading, withLoading } = useLoading();
-
   const [email, setEmail] = useState('')
-  const [emailError, setEmailError] = useState('Ingresa tu correo electrónico')
-
+  const [emailError, setEmailError] = useState('')
   const router = useRouter()
-  /*
-  const validateEmail = (text: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    setEmail(text);
-    if (text === '') {
-      setEmailError('Ingresa tu correo electrónico'); // Clear error when empty
-    } else if (!emailRegex.test(text)) {
-      setEmailError('Por favor ingresa un correo válido');
-    } else {
-      setEmailError('');
-    }
-  };*/
-
-  const handleEmailInput = (text: string) => {
-    setEmail(text)
-    const emailError = validateEmailAndGetError(text);
-    setEmailError(emailError);
-  }
 
   const handleSendCode = async () => {
     console.log('send code');
@@ -44,23 +24,22 @@ export default function Resetpassword() {
       return false;
     }
 
+    if (!email) {
+      Alert.alert('Error', 'Por favor ingresa tu correo electrónico');
+      return false;
+    }
+
     const body = { email }
 
-    const url = "https://backend-sharing-ride-app.onrender.com/api/resetpassword"
+    const url = `${getURL()}/api/resetpassword`;
 
     try {
-      //const response = await axios.post(url, body)
-      await withLoading(
+      const response = await withLoading(
         axios.post(url, body)
       )
 
-      //console.log('response', response);
-      console.log('code send');
+      console.log('code send, response?', response.data);
       
-      
-      //guardar email para resetear 
-      //const store = await AsyncStorage.setItem('email', email)
-      //console.log('store', store);
       await AsyncStorage.setItem('email', email).then(() => {
         console.log('email saved');
       }).catch(error => {
@@ -81,22 +60,18 @@ export default function Resetpassword() {
     } catch (error) {
       console.log('error', error);
       
-      Alert.alert('Error', 'Hubo un error al enviar el código')
+      Alert.alert('Error', 'Error al enviar el código, revise la dirección de correo electrónico');
     }
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.subtitle}>Resetea tu contraseña ingresando el código que te enviaremos a tu correo electrónico</Text>
-      <Text style={styles.label}>Correo electrónico</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ingresa tu correo"
-        value={email}
-        onChangeText={handleEmailInput}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
+      <InputEmail 
+        email={email}
+        setEmail={setEmail}
+        emailError={emailError}
+        setEmailError={setEmailError}
       />
       <Button title="Enviar Código" onPress={handleSendCode} />
 
