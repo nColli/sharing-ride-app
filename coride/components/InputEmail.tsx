@@ -11,8 +11,6 @@ export default function InputEmail({ email, setEmail, emailError, setEmailError 
     
     setEmailError(error);
   }
-
-  console.log('email error', emailError);
   
 
   return (

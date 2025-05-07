@@ -5,13 +5,14 @@ import { useState } from "react"
 import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native"
 import { styles } from "../styles";
 import LoginWelcome from "../components/LoginWelcome";
+import FormLogin from "../components/FormLogin";
 
 import LoadingOverlay from '../components/LoadingOverlay';
 import useLoading from '../custom_hooks/useLoading';
 import InputEmail from "../components/InputEmail";
 import ErrorText from "../components/ErrorText";
 import InputPassword from "../components/InputPassword";
-import saveUserData from "../utils/saveAuthToken";
+import saveAuthToken from "../utils/saveAuthToken";
 
 export default function Home() {
   const { isLoading, withLoading } = useLoading();
@@ -47,6 +48,7 @@ export default function Home() {
     router.navigate('home')
   }
 
+
   const handleLogin = async () => {
     console.log('handle login');
 
@@ -66,7 +68,7 @@ export default function Home() {
     try {
       await withLoading (
         axios.post(url, body)
-          .then((response) => {saveUserData(response)})
+          .then((response) => {saveAuthToken(response)})
       );
       navigateToHome()
       
@@ -81,31 +83,13 @@ export default function Home() {
         setLoginError('');
       }, 3000)
     }
-
-    
   }
 
   return (
     <View style={styles.container}>
       <LoginWelcome></LoginWelcome>
 
-      <InputEmail
-        email={email}
-        setEmail={setEmail}
-        emailError={emailError}
-        setEmailError={setEmailError}
-      />
-
-      <InputPassword
-        password={password}
-        setPassword={setPassword}
-      /> 
-
-      <ErrorText error={loginError}/>
-      
-      <View style={styles.button}>
-        <Button title="Iniciar Sesión" onPress={handleLogin} />
-      </View>
+      <FormLogin></FormLogin>
 
       <View style={{
         borderBottomColor: 'black', 
@@ -121,7 +105,6 @@ export default function Home() {
         <Button title="Registrate acá" onPress={() => router.navigate('createaccount')} />
       </View>
       
-      <LoadingOverlay visible={isLoading} />
     </View>
   )
 }

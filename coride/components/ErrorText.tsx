@@ -3,7 +3,7 @@ import { styles } from "../styles";
 
 export default function ErrorText({ error }: { error: string }) {
     if (!error) {
-        return null; // no renderizar nada si no hay error
+        return // no renderizar nada si no hay error
     }
 
     return (

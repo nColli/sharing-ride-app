@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AxiosResponse } from "axios";
 
-export default async function saveUserData(response: AxiosResponse<any>) {
+export default async function saveAuthToken(response: AxiosResponse<any>) {
   console.log('response', response);
   
   const authToken = response.data.tokenLogin;
