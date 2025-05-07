@@ -59,7 +59,8 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#e74c3c",
     marginBottom: 10,
-    fontSize: 14,
+    textAlign: 'center',
+    fontSize: 17,
   },
   photosContainer: {
     flexDirection: 'row',

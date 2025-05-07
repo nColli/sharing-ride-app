@@ -7,6 +7,7 @@ import { styles } from "../../styles";
 
 import LoadingOverlay from '../../components/LoadingOverlay';
 import useLoading from '../../custom_hooks/useLoading';
+import { validateEmailAndGetError } from "../../utils/validateEmail";
  
 export default function Resetpassword() {
   const { isLoading, withLoading } = useLoading();
@@ -15,7 +16,7 @@ export default function Resetpassword() {
   const [emailError, setEmailError] = useState('Ingresa tu correo electrónico')
 
   const router = useRouter()
-
+  /*
   const validateEmail = (text: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -27,7 +28,13 @@ export default function Resetpassword() {
     } else {
       setEmailError('');
     }
-  };
+  };*/
+
+  const handleEmailInput = (text: string) => {
+    setEmail(text)
+    const emailError = validateEmailAndGetError(text);
+    setEmailError(emailError);
+  }
 
   const handleSendCode = async () => {
     console.log('send code');
@@ -86,7 +93,7 @@ export default function Resetpassword() {
         style={styles.input}
         placeholder="Ingresa tu correo"
         value={email}
-        onChangeText={validateEmail}
+        onChangeText={handleEmailInput}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}

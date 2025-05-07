@@ -8,33 +8,23 @@ import LoginWelcome from "../components/LoginWelcome";
 
 import LoadingOverlay from '../components/LoadingOverlay';
 import useLoading from '../custom_hooks/useLoading';
+import { validateEmailAndGetError } from "../utils/validateEmail";
+import InputEmail from "../components/InputEmail";
+import ErrorText from "../components/ErrorText";
 
 export default function Home() {
   const { isLoading, withLoading } = useLoading();
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('Ingresa tu correo electrónico');
+  const [emailError, setEmailError] = useState('');
+  const [loginError, setLoginError] = useState('');
   const router = useRouter()
 
   /*
   USE EFFECT SI USUARIO ESTA VALIDADO - SEND TO HOME
 
   */
-
-
-  const validateEmail = (text: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    setEmail(text);
-    if (text === '') {
-      setEmailError('Ingresa tu correo electrónico'); // Clear error when empty
-    } else if (!emailRegex.test(text)) {
-      setEmailError('Por favor ingresa un correo válido');
-    } else {
-      setEmailError('');
-    }
-  };
 
   const handlePasswordInput = (text: string) => {
     setPassword(text)
@@ -115,6 +105,12 @@ export default function Home() {
       console.log('error', error);
       
       Alert.alert('Usuario incorrecto', 'El correo o la contraseña no son correctas')
+      
+      setLoginError('El correo o la contraseña no son correctas')
+
+      setTimeout(() => {
+        setLoginError('');
+      }, 3000)
     }
 
     
@@ -124,15 +120,11 @@ export default function Home() {
     <View style={styles.container}>
       <LoginWelcome></LoginWelcome>
 
-      <Text style={styles.label}>Correo electrónico</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ingresa tu correo"
-        value={email}
-        onChangeText={validateEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
+      <InputEmail
+        email={email}
+        setEmail={setEmail}
+        emailError={emailError}
+        setEmailError={setEmailError}
       />
 
       <Text style={styles.label}>Contraseña</Text>
@@ -147,6 +139,8 @@ export default function Home() {
         secureTextEntry
       />
 
+      <ErrorText error={loginError}/>
+      
       <View style={styles.button}>
         <Button title="Iniciar Sesión" onPress={handleLogin} />
       </View>
