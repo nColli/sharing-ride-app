@@ -7,6 +7,8 @@ import { styles } from "../../styles";
 
 import LoadingOverlay from '../../components/LoadingOverlay';
 import useLoading from '../../custom_hooks/useLoading';
+import saveAuthToken from "../../utils/saveAuthToken";
+import getURL from "../../utils/url";
 
 export default function Entercode() {
   const { isLoading, withLoading } = useLoading();
@@ -18,7 +20,7 @@ export default function Entercode() {
   const saveToken = (code: string) => {
     setToken(code)
   };
-
+/*
   const saveUserData = async (response: AxiosResponse<any>) => {
     console.log('response', response);
     
@@ -37,7 +39,7 @@ export default function Entercode() {
         console.log('error getting item', error);
         return
       })
-  }
+  }*/
 
   const navigateToIndex = () => {
     router.navigate('../index')
@@ -54,20 +56,37 @@ export default function Entercode() {
       email
     }
 
-    const URL = "https://backend-sharing-ride-app.onrender.com/api/resetpassword/"
-    const URL_TOKEN = URL.concat(token)
+    //const URL = "https://backend-sharing-ride-app.onrender.com/api/resetpassword/"
+    const URL_TOKEN = getURL() + 'api/resetpassword/' + token
+  
+    //const URL_TOKEN = URL.concat(token)
 
     console.log('url', URL_TOKEN);
     
     try {
       /*const response = await axios.post(URL_TOKEN, body)
       saveUserData(response)*/
+      /*
       await withLoading(
         axios.post(URL_TOKEN, body)
           .then((response) => {
-            saveUserData(response)
+            await saveAuthToken(response)
           })
+      )*/
+
+      const response = await withLoading(
+        axios.post(URL_TOKEN, body)
       )
+
+      console.log('response', response);
+      
+      if (response.status !== 200) {
+        Alert.alert('Error', 'El código no es correcto')
+        return
+      }
+
+      await saveAuthToken(response)
+
       
       router.navigate('resetpassword/newpassword')
 

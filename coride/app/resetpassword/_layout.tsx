@@ -1,6 +1,4 @@
 import { Stack } from 'expo-router';
-import { useState } from 'react';
-import Resetpassword from '.';
 
 export default function RootLayout() {
     return (
