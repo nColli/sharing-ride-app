@@ -1,4 +1,4 @@
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, Alert } from "react-native";
 import { styles } from "../../../styles";
 import {Picker} from '@react-native-picker/picker';
 import { useEffect, useState } from "react";
@@ -7,12 +7,13 @@ import axios from "axios";
 import { useRouter } from "expo-router";
 
 interface vehicle {
-    name: string
+    name: string;
+    model: string;
 }
 
 export default function SelectVehicle() {
     const [vehicles, setVehicles] = useState<vehicle[]>([]);
-    const [selectedVehicle, setSelectedVehicle] = useState();
+    const [selectedVehicle, setSelectedVehicle] = useState<vehicle | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -22,13 +23,30 @@ export default function SelectVehicle() {
             .then((response) => {
                 setVehicles(response.data);
             })
+            .catch((error) => {
+                console.log('error al obtener lugares');
+                //redireccionar a home con aviso de que lo intente de nuevo
+            })
 
         console.log('vehicles owned by user', vehicles);
 
     }, []);
 
     const handleRegisterVehicle = () => {
-        router.navigate('home/registervehicle')
+        router.navigate('home/registervehicle') //dsp hacer que cuando se registra vehiculo se retorne aca y no a home, marcar de donde proviene con context general
+    }
+
+    const handleContinue = () => {
+        //agregar vehiculo a localstorage
+
+        if (selectedVehicle != null) {
+            router.navigate('home/registertrip/registerstart');
+            return;
+        }
+        
+        //no selecciono vehiculo
+        Alert.alert('Seleccionar vehiculo', 'Por favor selecciona o crea un vehiculo');
+        return;
     }
 
     return (
@@ -49,6 +67,7 @@ export default function SelectVehicle() {
                     <Picker.Item label={vehicle.name} value={vehicle} />
                 ))} 
             </Picker>
+            <Button title="Continuar" onPress={handleContinue} />
             <Text style={styles.subtitle}>
                 ¿Querés registrar otro vehículo?
             </Text>
