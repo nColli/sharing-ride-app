@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import getURL from "../../../utils/url";
-import axios from "axios";
-import { View, Text, TextInput, Button } from "react-native";
-import { styles } from "../../../styles";
-import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
+import getURL from '../utils/url';
+import axios from 'axios';
+import { Picker } from '@react-native-picker/picker';
+import { View, TextInput, Button, Text } from 'react-native';
+import { styles } from '../styles';
 
 interface Place {
     name: string;
@@ -13,24 +13,26 @@ interface Place {
     city: string;
 }
 
-export default function SelectStartPlace() {
-    const defaultPlace: Place = {
-        name: '',
-        street: '',
-        number: '',
-        city: ''
-    }
+type SelectPlaceProps = {
+    handleContinuar: () => void;
+    handleChangeCalle: (text: string) => void;
+    handleChangeLocalidad: (text: string) => void;
+    handleChangeNumero: (text: string) => void;
+};
 
-    const [place, setPlace] = useState<Place>(defaultPlace);
+export default function SelectPlace({
+    handleContinuar,
+    handleChangeCalle,
+    handleChangeLocalidad,
+    handleChangeNumero
+}: SelectPlaceProps) {
     const [regularPlaces, setRegularPlaces] = useState<Place[]>([]);
     const [selectedRegularPlace, setSelectedRegularPlace] = useState<Place | null>(null);
-
-    const router = useRouter();
 
     useEffect(() => {
         const url = getURL() + '/api/places';
 
-        axios.get(url)
+        axios.get(url) //agregar token
             .then((response) => {
                 setRegularPlaces(response.data);
             })
@@ -40,43 +42,6 @@ export default function SelectStartPlace() {
             })
 
     }, []);
-
-
-    const handleChangeCalle = (calle: string) => {
-        const newPlace: Place = {
-                ...place,
-                street: calle
-            }
-
-        setPlace(newPlace);
-    }
-
-    const handleChangeNumero = (numero: string) => {
-        const newPlace: Place = {
-                ...place,
-                number: numero
-            }
-
-        setPlace(newPlace);
-    }
-
-    const handleChangeLocalidad = (localidad: string) => {
-        const newPlace: Place = {
-                ...place,
-                city: localidad
-            }
-
-        setPlace(newPlace);
-    }
-
-    const handleContinuar = () => {
-        //guardar datos en localstorage
-        
-        
-        router.navigate('/home/registertrip/registerend')
-    }
-    
-    
 
     return (
         <View style={styles.container}>
@@ -89,7 +54,7 @@ export default function SelectStartPlace() {
                 }
             >
                 {regularPlaces.map((place) => (
-                    <Picker.Item label={place.name} value={place} />
+                    <Picker.Item key={place.name} label={place.name} value={place} />
                 ))} 
             </Picker>
             <Text>Calle:</Text>
