@@ -34,7 +34,18 @@ export default function SelectVehicle() {
         //redireccionar a home con aviso de que lo intente de nuevo
         Alert.alert("Error del servidor", "Pruebe reiniciando la aplicación");
       });
+
+    //comentado porque el hook se actualiza despues por lo que vehicles puede estar en null
+    //setSelectedVehicle(vehicles[0]);
+    //console.log("vehiculo elegido en useEffect", selectedVehicle);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  //solucion temporal - agregar en axios.get con response
+  if (vehicles !== null && selectedVehicle === null) {
+    setSelectedVehicle(vehicles[0]);
+  }
 
   const handleRegisterVehicle = () => {
     router.navigate("home/register-vehicle"); //dsp hacer que cuando se registra vehiculo se retorne aca y no a home, marcar de donde proviene con context general
@@ -62,6 +73,11 @@ export default function SelectVehicle() {
     return;
   };
 
+  const handleVehiclePick = (itemValue, itemIndex) => {
+    console.log("index vehiculo", itemValue, "vehiculo", itemValue);
+    setSelectedVehicle(vehicles[itemIndex]);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>¡Registra tu viaje!</Text>
@@ -71,15 +87,13 @@ export default function SelectVehicle() {
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedVehicle}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedVehicle(itemValue)
-          }
+          onValueChange={handleVehiclePick}
         >
           {vehicles.map((vehicle) => (
             <Picker.Item
               label={vehicle.brand + " " + vehicle.model + " " + vehicle.year}
               value={vehicle}
-              key={vehicle.model + vehicle.year}
+              key={vehicle}
             />
           ))}
         </Picker>

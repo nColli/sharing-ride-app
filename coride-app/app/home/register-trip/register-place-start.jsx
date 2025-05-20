@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import getURL from "../../../utils/url";
 import axios from "axios";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, ScrollView } from "react-native";
 import { styles } from "../../../utils/styles";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useTrip } from "./TripContext";
 import { PROVINCES } from "../../../utils/provinces";
+import { useAuth } from "../../AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SelectStartPlace() {
+  const { auth } = useAuth();
   const { trip, setTrip } = useTrip();
 
   const defaultPlace = {
@@ -27,15 +30,24 @@ export default function SelectStartPlace() {
   useEffect(() => {
     const url = getURL() + "/api/places";
 
+    const token = auth;
+
     axios
-      .get(url)
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
-        setRegularPlaces(response.data);
+        const regularPlaces = response.data;
+        setRegularPlaces(regularPlaces);
+        setSelectedRegularPlace(regularPlaces[0]);
       })
       .catch((error) => {
         console.log("error al obtener lugares");
         //redireccionar a home con aviso de que lo intente de nuevo
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChangeCalle = (calle) => {
@@ -75,6 +87,11 @@ export default function SelectStartPlace() {
   };
 
   const handleContinuar = () => {
+    //verificar que si place quedo en defaultPlace, se asume que se eligio un regularPlace
+    if (place === defaultPlace) {
+      setPlace(selectedRegularPlace);
+    }
+
     //guardar datos en hook
     const newTrip = {
       ...trip,
@@ -87,42 +104,47 @@ export default function SelectStartPlace() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Registra tu recorrido</Text>
-      <Text style={styles.subtitle}>Elegi un punto de partida</Text>
-      <Picker
-        selectedValue={selectedRegularPlace}
-        onValueChange={(itemValue, itemIndex) =>
-          setSelectedRegularPlace(itemValue)
-        }
-      >
-        {regularPlaces.map((place, idx) => (
-          <Picker.Item key={idx} label={place.name} value={place} />
-        ))}
-      </Picker>
-      <Text>Calle:</Text>
-      <TextInput style={styles.input} onChangeText={handleChangeCalle} />
-      <Text>Numero:</Text>
-      <TextInput style={styles.input} onChangeText={handleChangeNumero} />
-      <Text>Localidad:</Text>
-      <TextInput style={styles.input} onChangeText={handleChangeLocalidad} />
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Registra tu recorrido</Text>
+        <Text style={styles.subtitle}>
+          Elegi un punto de partida habitual o agrega uno nuevo
+        </Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedRegularPlace}
+            onValueChange={(itemValue, itemIndex) => {
+              console.log("item value pick place", itemValue);
+              setSelectedRegularPlace(regularPlaces[itemIndex]);
+            }}
+          >
+            {regularPlaces.map((place, idx) => (
+              <Picker.Item key={idx} label={place.name} value={place} />
+            ))}
+          </Picker>
+        </View>
+        <Text>Calle:</Text>
+        <TextInput style={styles.input} onChangeText={handleChangeCalle} />
+        <Text>Numero:</Text>
+        <TextInput style={styles.input} onChangeText={handleChangeNumero} />
+        <Text>Localidad:</Text>
+        <TextInput style={styles.input} onChangeText={handleChangeLocalidad} />
 
-      {/* AGREGAR SELECCIONADOR DE PROVINCIAS, LISTA EXTRAERLA EN UTILITY Y VER DE HACER COMPONENTE PERSONALIZADO, ENVIANDOLE LOS HOOKS */}
+        <Text style={styles.label}>Provincia</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={place["province"]}
+            onValueChange={handleChangeProvincia}
+          >
+            <Picker.Item label="Seleccione una provincia" value="" />
+            {PROVINCES.map((prov) => (
+              <Picker.Item key={prov} label={prov} value={prov} />
+            ))}
+          </Picker>
+        </View>
 
-      <Text style={styles.label}>Provincia</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={place["province"]}
-          onValueChange={handleChangeProvincia}
-        >
-          <Picker.Item label="Seleccione una provincia" value="" />
-          {PROVINCES.map((prov) => (
-            <Picker.Item key={prov} label={prov} value={prov} />
-          ))}
-        </Picker>
+        <Button title="continuar" onPress={handleContinuar} />
       </View>
-
-      <Button title="continuar" onPress={handleContinuar} />
-    </View>
+    </ScrollView>
   );
 }

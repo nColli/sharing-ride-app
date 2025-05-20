@@ -9,6 +9,18 @@ export default function RootLayout() {
           name="index"
           options={{ headerShown: false, title: "Registrar viaje" }}
         />
+        <Stack.Screen
+          name="register-place-start"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="register-place-end"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="register-time-start"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </TripProvider>
   );
