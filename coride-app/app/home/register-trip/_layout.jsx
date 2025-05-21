@@ -21,6 +21,14 @@ export default function RootLayout() {
           name="register-time-start"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="register-pick-distance"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="register-routine"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </TripProvider>
   );

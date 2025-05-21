@@ -86,18 +86,40 @@ export default function SelectStartPlace() {
     setPlace(newPlace);
   };
 
-  const handleContinuar = () => {
-    if (place === defaultPlace) {
-      setPlace(selectedRegularPlace);
+  function isPlaceEmpty() {
+    if (place.city === "" || place.province === "" || place.street === "" || place.number === "") {
+      return false;
     }
 
-    //guardar datos en hook
-    const newTrip = {
-      ...trip,
-      placeEnd: place,
-    };
+    return true;
+  }
 
-    setTrip(newTrip);
+  const handleContinuar = () => {
+    if (isPlaceEmpty) {
+      console.log("lugar ya registrado elegido");
+      console.log("selectedRegularPlace", selectedRegularPlace);
+
+      const newTrip = {
+        ...trip,
+        placeEnd: selectedRegularPlace,
+      };
+
+      console.log("new trip en seleccionar lugar de llegada", newTrip);
+
+      setTrip(newTrip);
+
+    } else {
+      console.log("lugar nuevo elegido", place);
+
+      const newTrip = {
+        ...trip,
+        placeEnd: place,
+      };
+
+      console.log("new trip en seleccionar lugar de llegada", newTrip);
+
+      setTrip(newTrip);
+    }
 
     router.navigate("/home/register-trip/register-time-start");
   };

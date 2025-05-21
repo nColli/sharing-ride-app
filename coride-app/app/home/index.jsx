@@ -40,7 +40,8 @@ const HomeScreen = () => {
   const handleFunctionPress = (route) => {
     console.log("route", route);
 
-    router.navigate(route);
+    //router.navigate(route);
+    router.push(route);
   };
 
   return (
