@@ -28,6 +28,24 @@ const functionalButtons = [
     icon: "🚀",
     route: "home/register-trip",
   },
+  {
+    id: "4",
+    title: "Viajes pendientes",
+    icon: "🚗",
+    route: "home/pending-trips",
+  },
+  {
+    id: "5",
+    title: "Reservar viaje",
+    icon: "🚗",
+    route: "home/reserve-trip",
+  },
+  {
+    id: "6",
+    title: "Reservas pendientes",
+    icon: "🚗",
+    route: "home/pending-reserves",
+  },
 ];
 
 const HomeScreen = () => {

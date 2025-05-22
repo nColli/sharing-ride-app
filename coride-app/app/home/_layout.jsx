@@ -19,6 +19,15 @@ export default function RootLayout() {
         name="register-trip"
         options={{ title: "Registrar viaje" }}
       />
+      <Stack.Screen
+        name="pending-trips"
+        options={{ title: "Viajes pendientes" }}
+      />
+      <Stack.Screen name="reserve-trip" options={{ title: "Reservar viaje" }} />
+      <Stack.Screen
+        name="pending-reserves"
+        options={{ title: "Reservas de viajes" }}
+      />
     </Stack>
   );
 }

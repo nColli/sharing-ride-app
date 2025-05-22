@@ -128,8 +128,84 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   inlineHand: {
-    fontSize: 28, // match welcomeText size
+    fontSize: 28,
     marginLeft: 4,
+  },
+  // Trip container styles
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  tripContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tripHeader: {
+    marginBottom: 12,
+  },
+  datePassengers: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  dateText: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+  },
+  passengersText: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+  },
+  timeText: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  locations: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  locationText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 6,
+    lineHeight: 22,
+  },
+  chatButton: {
+    flex: 1,
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: '#FF3B30',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
 
