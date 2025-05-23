@@ -4,6 +4,18 @@ import { useRouter } from "expo-router";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useState } from "react";
 import { styles } from "../../../utils/styles";
+import { MultiSelect } from "react-native-element-dropdown";
+import AntDesign from "@expo/vector-icons/AntDesign";
+
+const data = [
+  { label: "Domingo", value: "Sunday" },
+  { label: "Lunes", value: "Monday" },
+  { label: "Martes", value: "Tuesday" },
+  { label: "Miercoles", value: "Wednesday" },
+  { label: "Jueves", value: "Thursday" },
+  { label: "Viernes", value: "Friday" },
+  { label: "Sabado", value: "Saturday" },
+];
 
 export default function RegisterRoutine() {
   const { reserve, setReserve } = useReserve();
@@ -12,6 +24,7 @@ export default function RegisterRoutine() {
   const [showDatePickerEnd, setShowDatePickerEnd] = useState(false);
   const [dateStart, setDateStart] = useState(new Date());
   const [dateEnd, setDateEnd] = useState(new Date());
+  const [days, setDays] = useState([]);
 
   const onChangeDateStart = (event) => {
     setShowDatePickerStart(false);
@@ -48,7 +61,7 @@ export default function RegisterRoutine() {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.title}>Registrar rutina</Text>
 
       <Text style={styles.label}>Fecha de inicio de la rutina</Text>
@@ -77,6 +90,33 @@ export default function RegisterRoutine() {
         onConfirm={onChangeDateEnd}
         onCancel={() => setShowDatePickerEnd(false)}
         isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+      />
+
+      <MultiSelect
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        search
+        data={data}
+        labelField="label"
+        valueField="value"
+        placeholder="Select item"
+        searchPlaceholder="Search..."
+        value={days}
+        onChange={(item) => {
+          setDays(item);
+        }}
+        renderLeftIcon={() => (
+          <AntDesign
+            style={styles.icon}
+            color="black"
+            name="Safety"
+            size={20}
+          />
+        )}
+        selectedStyle={styles.selectedStyle}
       />
 
       <Button title="Continuar" onPress={handleRegistrarDistancia} />

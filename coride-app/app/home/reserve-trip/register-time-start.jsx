@@ -51,6 +51,7 @@ export default function SelectTimeStart() {
     const newReserve = {
       ...reserve,
       date: timeStart,
+      isRoutine: false,
     };
 
     console.log("new trip en seleccionar fecha y hora", newReserve);

@@ -156,7 +156,8 @@ export default function VehicleRegistration() {
       );
       Alert.alert("Vehiculo registrado", "Vehículo registrado correctamente");
 
-      router.navigate("/home");
+      //router.navigate("/home");
+      router.back();
       // eslint-disable-next-line no-unused-vars
     } catch (error) {
       Alert.alert("Error", "Verifique los datos ingresados");

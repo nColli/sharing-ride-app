@@ -33,6 +33,7 @@ export default function PendingReserves() {
         },
       })
       .then((response) => {
+        //console.log("reserves", response.data);
         setReserves(response.data);
       })
       .catch((error) => {
@@ -50,60 +51,49 @@ export default function PendingReserves() {
       <View style={styles.container}>
         <Text style={styles.title}>Reservas pendientes</Text>
         {reserves.map((reserve) => (
-          <ContainerTrip key={reserve._id} trip={reserve} />
+          <ContainerTrip key={reserve._id} reserve={reserve} />
         ))}
         <Button title="Volver" onPress={() => router.push("/home")} />
       </View>
     </ScrollView>
   );
 }
-const ContainerTrip = ({ trip }) => {
+const ContainerTrip = ({ reserve }) => {
   const router = useRouter();
 
   const handleChatAccess = () => {
-    router.push("/home/chat/" + trip._id);
+    router.push("/home/chat/" + reserve._id);
   };
 
-  const handleDeleteTrip = () => {
-    router.push("/home/delete/" + trip._id);
+  const handleDeleteReserve = () => {
+    router.push("/home/delete/" + reserve._id);
   };
 
   return (
     <View style={styles.tripContainer}>
       <View style={styles.tripHeader}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-            💲{trip.tripCost}
+        <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+          Estado: {reserve.status}
+        </Text>
+        <View style={styles.datePassengers}>
+          <Text style={styles.dateText}>
+            Fecha: {format(new Date(reserve.dateStart), "yyyy / MM / dd")}
           </Text>
-          <View style={styles.datePassengers}>
-            <Text style={styles.dateText}>
-              Fecha: {format(new Date(trip.dateStart), "yyyy / MM / dd")}
-            </Text>
-            <Text style={styles.passengersText}>
-              Pasajeros: {trip.bookings ? trip.bookings.length : 0}
-            </Text>
-          </View>
         </View>
         <Text style={styles.timeText}>
           Hora inicio:{" "}
-          {format(new Date(trip.dateStart), "hh:mm a", { locale: es })}
+          {format(new Date(reserve.dateStart), "hh:mm a", { locale: es })}
         </Text>
       </View>
 
       <View style={styles.locations}>
         <Text style={styles.locationText}>
-          Desde: {trip.placeStart.street} {trip.placeStart.number},{" "}
-          {trip.placeStart.city}
+          Desde: {reserve.placeStart?.street} {reserve.placeStart?.number},{" "}
+          {reserve.placeStart?.city}
         </Text>
         <Text style={styles.locationText}>
-          Hacia: {trip.placeEnd.street} {trip.placeEnd.number},{" "}
-          {trip.placeEnd.city}
+          Hacia: {reserve.placeEnd?.street} {reserve.placeEnd?.number},{" "}
+          {reserve.placeEnd?.city}
         </Text>
       </View>
 
@@ -114,9 +104,9 @@ const ContainerTrip = ({ trip }) => {
 
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={handleDeleteTrip}
+          onPress={handleDeleteReserve}
         >
-          <Text style={styles.buttonText}>Eliminar viaje</Text>
+          <Text style={styles.buttonText}>Eliminar reserva</Text>
         </TouchableOpacity>
       </View>
     </View>

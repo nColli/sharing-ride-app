@@ -9,16 +9,15 @@ import { useRouter } from "expo-router";
 
 export default function ConfirmReserve() {
   const { auth } = useAuth();
-  const { reserve } = useReserve();
+  const { reserve, setReserve } = useReserve();
   const router = useRouter();
-  const [reserveTrip, setReserveTrip] = useState(reserve);
   const [reserveFinded, setReserveFinded] = useState(false);
 
   function getPrecioViaje() {
-    if (reserveTrip === reserve) {
+    if (reserve.tripCost === undefined) {
       return "0";
     } else {
-      return reserveTrip.tripCost;
+      return reserve.tripCost;
     }
   }
 
@@ -26,15 +25,11 @@ export default function ConfirmReserve() {
     const url = getUrl();
     const token = auth;
 
-    const urlConfirmacion = url + "/api/reserve/" + reserveTrip.id;
+    const urlConfirmacion = url + "/api/reserves/confirm";
     console.log("url para confirmar reserva", urlConfirmacion);
 
-    const content = {
-      status: "confirm",
-    };
-
     axios
-      .patch(urlConfirmacion, content, {
+      .patch(urlConfirmacion, reserve, {
         headers: {
           Authorization: `Bearer: ${token}`,
         },
@@ -47,6 +42,7 @@ export default function ConfirmReserve() {
 
   useEffect(() => {
     const reserveNotCompleted = () => {
+      Alert.alert("Error", "No se ha encontrado una reserva pruebe más tarde");
       router.push("/home");
     };
 
@@ -54,7 +50,7 @@ export default function ConfirmReserve() {
     const url = getUrl();
     const token = auth;
 
-    const urlRequest = url + "/api/reserve";
+    const urlRequest = url + "/api/reserves";
 
     axios
       .post(urlRequest, reserve, {
@@ -64,11 +60,24 @@ export default function ConfirmReserve() {
       })
       .then((response) => {
         const res = response.data;
-        if (!res.id) {
+        if (res.error) {
           reserveNotCompleted();
-        } else {
-          setReserveTrip(res);
+        } else if (reserve.isRoutine) {
           setReserveFinded(true);
+          setReserve(res.reserves);
+        } else {
+          setReserveFinded(true);
+          const reserves = [];
+          reserves = reserves.concat(res.reserve);
+          setReserve(reserves);
+
+          if (res.message) {
+            console.log("mensaje del servidor", res.message);
+            Alert.alert(
+              "Alerta",
+              "No se han podido reservas todos los viajes, revise en la pestaña de proximos viajes",
+            );
+          }
         }
       })
       .catch((error) => {
@@ -80,23 +89,6 @@ export default function ConfirmReserve() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!reserveTrip.id) {
-    return <View></View>;
-  }
-  /*
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>¡Reserva confirmada!</Text>
-      <Text style={styles.label}>
-        Nuestro sistema ha encontrado un conductor con el que podés ir. fecha a
-        la hora estipulada, la aplicación te informará cuando esté cerca.
-        También tenés un chat para hablar con el.
-      </Text>
-      <Text>Costo del viaje</Text>
-      <Text>{getPrecioViaje()}</Text>
-      <Button title="Confirmar reserva" onPress={confirmarReserva} />
-    </View>
-  );*/
   return (
     <View style={styles.container}>
       {reserveFinded && (

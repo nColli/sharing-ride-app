@@ -7,6 +7,8 @@ import axios from "axios";
 import { useRouter } from "expo-router";
 import { useTrip } from "./TripContext";
 import { useAuth } from "../../AuthContext";
+import { useFocusEffect } from "@react-navigation/native";
+import React from "react";
 
 export default function SelectVehicle() {
   const { auth } = useAuth();
@@ -15,32 +17,30 @@ export default function SelectVehicle() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const url = getURL() + "/api/vehicles"; //obt vehiculos del usuario
+  useFocusEffect(
+    React.useCallback(() => {
+      const url = getURL() + "/api/vehicles"; //obt vehiculos del usuario
 
-    const token = auth;
+      const token = auth;
 
-    axios
-      .get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setVehicles(response.data);
-      })
-      .catch((error) => {
-        console.log("error al obtener lugares");
-        //redireccionar a home con aviso de que lo intente de nuevo
-        Alert.alert("Error del servidor", "Pruebe reiniciando la aplicación");
-      });
+      console.log("using useFocusEffect");
 
-    //comentado porque el hook se actualiza despues por lo que vehicles puede estar en null
-    //setSelectedVehicle(vehicles[0]);
-    //console.log("vehiculo elegido en useEffect", selectedVehicle);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      axios
+        .get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setVehicles(response.data);
+        })
+        .catch((error) => {
+          console.log("error al obtener lugares");
+          //redireccionar a home con aviso de que lo intente de nuevo
+          Alert.alert("Error del servidor", "Pruebe reiniciando la aplicación");
+        });
+    }, []),
+  );
 
   //solucion temporal - agregar en axios.get con response
   if (vehicles !== null && selectedVehicle === null) {

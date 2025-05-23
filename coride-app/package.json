@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-native-community/datetimepicker": "8.3.0",
     "@react-native-picker/picker": "^2.11.0",
+    "@react-navigation/native": "^7.1.9",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "expo": "~53.0.9",
@@ -22,9 +23,11 @@
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-element-dropdown": "^2.12.4",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.10.0"
+    "react-native-screens": "~4.10.0",
+    "undefined": "@expo/vector-icons/AntDesign"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -16,11 +16,11 @@ export default function RegisterDistance() {
 
   const handleRegistrarViaje = async () => {
     try {
+      //crear viaje de acuerdo a si es o no una rutina
       const tripToPost = {
         ...trip,
         searchRadiusKm: radioBusqueda,
         arrivalRadiusKm: radioDejar,
-        isRoutine: false,
         pricePerPassenger: precio,
       };
 
@@ -31,24 +31,11 @@ export default function RegisterDistance() {
 
       console.log("response save trip", response);
 
-      /*Alert.alert("Éxito", "Viaje registrado correctamente", [
-        { text: "OK", onPress: () => router.navigate("/home") },
-      ]);*/
       Alert.alert("Éxito", "Viaje registrado correctamente");
       router.navigate("/home");
     } catch (error) {
       console.error("Error al guardar el viaje:", error);
-      /*
-      Alert.alert(
-        "Error",
-        "No se pudo registrar el viaje. Por favor, inténtelo nuevamente.",
-        [
-          {
-            text: "OK",
-            onPress: () => router.navigate("/home"),
-          },
-        ]
-      );*/
+
       Alert.alert(
         "Error",
         "No se pudo registrar el viaje. Por favor, inténtelo nuevamente.",
