@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 
 export default function SelectTimeStart() {
   const [timeStart, setTimeStart] = useState(new Date());
+  const [dateStart, setDateStart] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function SelectTimeStart() {
     setShowDatePicker(false);
 
     if (event) {
-      setTimeStart(event);
+      setDateStart(event);
     }
   };
 
@@ -46,11 +47,18 @@ export default function SelectTimeStart() {
   const handleContinuar = () => {
     //Guardar en useTrip
     //SI ES RUTINA SE GUARDA EN RUTINA CON UNA VARIABLE isRoutine en true para que server cree la rutina (crear los x objetos hasta que se llegue a la fecha)
-    console.log("fecha y hora elegida", timeStart);
+    console.log("fecha y hora elegida", timeStart, dateStart);
+
+    //poner en copyDateStart la hora y minutos elegidos en timeStart
+    const copyDateStart = dateStart;
+    copyDateStart.setHours(timeStart.getHours());
+    copyDateStart.setMinutes(timeStart.getMinutes());
+
+    console.log("copyDateStart:", copyDateStart);
 
     const newReserve = {
       ...reserve,
-      date: timeStart,
+      date: copyDateStart,
       isRoutine: false,
     };
 
@@ -79,12 +87,12 @@ export default function SelectTimeStart() {
       />
       <Text style={styles.label}>Selecciona la fecha del viaje:</Text>
       <Button
-        title={formatDate(timeStart)}
+        title={formatDate(dateStart)}
         onPress={() => setShowDatePicker(true)}
       />
       <DateTimePickerModal
         isVisible={showDatePicker}
-        time={timeStart}
+        time={dateStart}
         mode="date"
         onConfirm={onChangeDate}
         onCancel={() => setShowDatePicker(false)}

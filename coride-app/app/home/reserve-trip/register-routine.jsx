@@ -1,4 +1,11 @@
-import { View, Text, Button, Appearance } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  Appearance,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { useReserve } from "./ReserveContext";
 import { useRouter } from "expo-router";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -25,12 +32,24 @@ export default function RegisterRoutine() {
   const [dateStart, setDateStart] = useState(new Date());
   const [dateEnd, setDateEnd] = useState(new Date());
   const [days, setDays] = useState([]);
+  const [timeStart, setTimeStart] = useState(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const onChangeDateStart = (event) => {
     setShowDatePickerStart(false);
 
     if (event) {
       setDateStart(event);
+    }
+  };
+
+  const onChangeTime = (event) => {
+    setShowTimePicker(false);
+
+    console.log("change time", event);
+
+    if (event) {
+      setTimeStart(event);
     }
   };
 
@@ -46,13 +65,36 @@ export default function RegisterRoutine() {
     return date.toLocaleDateString("es-AR");
   };
 
+  const formatTime = (date) => {
+    return date.toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const handleRegistrarDistancia = () => {
+    if (days.length === 0) {
+      Alert.alert("Error", "Seleccione los días para registrar la rutina");
+      return;
+    }
+
+    const copyDateStart = dateStart;
+    copyDateStart.setHours(timeStart.getHours());
+    copyDateStart.setMinutes(timeStart.getMinutes());
+
+    const copyDateEnd = dateEnd;
+    copyDateEnd.setHours(timeStart.getHours());
+    copyDateEnd.setMinutes(timeStart.getMinutes());
+
+    console.log("date start", copyDateStart, "date end", copyDateEnd);
+
     //guardar en reserve
     const newReserve = {
       ...reserve,
-      dateStart: dateStart,
-      dateEnd: dateEnd,
+      dateStart: copyDateStart,
+      dateEnd: copyDateEnd,
       isRoutine: true,
+      days,
     };
 
     setReserve(newReserve);
@@ -61,65 +103,81 @@ export default function RegisterRoutine() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Registrar rutina</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Registrar rutina</Text>
 
-      <Text style={styles.label}>Fecha de inicio de la rutina</Text>
-      <Button
-        title={formatDate(dateStart)}
-        onPress={() => setShowDatePickerStart(true)}
-      />
-      <DateTimePickerModal
-        isVisible={showDatePickerStart}
-        time={dateStart}
-        mode="date"
-        onConfirm={onChangeDateStart}
-        onCancel={() => setShowDatePickerStart(false)}
-        isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-      />
+        <Text style={styles.label}>Fecha de inicio de la rutina</Text>
+        <Button
+          title={formatDate(dateStart)}
+          onPress={() => setShowDatePickerStart(true)}
+        />
+        <DateTimePickerModal
+          isVisible={showDatePickerStart}
+          time={dateStart}
+          mode="date"
+          onConfirm={onChangeDateStart}
+          onCancel={() => setShowDatePickerStart(false)}
+          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+        />
 
-      <Text style={styles.label}>Fecha de fin de la rutina</Text>
-      <Button
-        title={formatDate(dateEnd)}
-        onPress={() => setShowDatePickerEnd(true)}
-      />
-      <DateTimePickerModal
-        isVisible={showDatePickerEnd}
-        time={dateEnd}
-        mode="date"
-        onConfirm={onChangeDateEnd}
-        onCancel={() => setShowDatePickerEnd(false)}
-        isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-      />
+        <Text style={styles.label}>Fecha de fin de la rutina</Text>
+        <Button
+          title={formatDate(dateEnd)}
+          onPress={() => setShowDatePickerEnd(true)}
+        />
+        <DateTimePickerModal
+          isVisible={showDatePickerEnd}
+          time={dateEnd}
+          mode="date"
+          onConfirm={onChangeDateEnd}
+          onCancel={() => setShowDatePickerEnd(false)}
+          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+        />
 
-      <MultiSelect
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        search
-        data={data}
-        labelField="label"
-        valueField="value"
-        placeholder="Select item"
-        searchPlaceholder="Search..."
-        value={days}
-        onChange={(item) => {
-          setDays(item);
-        }}
-        renderLeftIcon={() => (
-          <AntDesign
-            style={styles.icon}
-            color="black"
-            name="Safety"
-            size={20}
-          />
-        )}
-        selectedStyle={styles.selectedStyle}
-      />
+        <Text style={styles.label}>Selecciona la hora del viaje:</Text>
+        <Button
+          title={formatTime(timeStart)}
+          onPress={() => setShowTimePicker(true)}
+        />
+        <DateTimePickerModal
+          isVisible={showTimePicker}
+          time={timeStart}
+          mode="time"
+          onConfirm={onChangeTime}
+          onCancel={() => setShowTimePicker(false)}
+          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+        />
 
-      <Button title="Continuar" onPress={handleRegistrarDistancia} />
-    </View>
+        <MultiSelect
+          style={styles.dropdown}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
+          search
+          data={data}
+          labelField="label"
+          valueField="value"
+          placeholder="Select item"
+          searchPlaceholder="Search..."
+          value={days}
+          onChange={(item) => {
+            setDays(item);
+          }}
+          renderLeftIcon={() => (
+            <AntDesign
+              style={styles.icon}
+              color="black"
+              name="Safety"
+              size={20}
+            />
+          )}
+          selectedStyle={styles.selectedStyle}
+        />
+
+        <Button title="Continuar" onPress={handleRegistrarDistancia} />
+      </View>
+    </ScrollView>
   );
 }
