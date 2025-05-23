@@ -37,13 +37,13 @@ const functionalButtons = [
   {
     id: "5",
     title: "Reservar viaje",
-    icon: "🚗",
+    icon: "🚘",
     route: "home/reserve-trip",
   },
   {
     id: "6",
     title: "Reservas pendientes",
-    icon: "🚗",
+    icon: "⏰",
     route: "home/pending-reserves",
   },
 ];

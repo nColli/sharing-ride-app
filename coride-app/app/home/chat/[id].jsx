@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 import {
   View,
@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import axios from "axios";
 import getUrl from "../../../utils/url";
+import { useAuth } from "../../AuthContext";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TripChat() {
   const { id } = useLocalSearchParams();
@@ -18,13 +20,40 @@ export default function TripChat() {
   const [error, setError] = useState("");
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const { auth } = useAuth();
+
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: `Chat`,
+    });
+  }, [navigation, id]);
 
   const fetchChat = async () => {
+    console.log("ejecutando fetchChat");
+    const token = auth;
+
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(`${getUrl()}/api/trips/${id}/chat`);
-      setMessages(res.data.chat || []);
+      const url = getUrl();
+      console.log("url", url);
+      const urlC = `${url}/api/trips/chat/${id}`;
+      console.log("url completo", urlC);
+      axios
+        .get(urlC, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          console.log("respuesta:", res.data);
+          setMessages(res.data.messages || []);
+        })
+        .catch((error) => {
+          console.log("error al solicitar chat", error.message);
+        });
     } catch (_err) {
       setError("Error al cargar el chat");
     } finally {
@@ -33,6 +62,8 @@ export default function TripChat() {
   };
 
   useEffect(() => {
+    console.log("ejecutando useEffect");
+
     fetchChat();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -42,7 +73,15 @@ export default function TripChat() {
     setSending(true);
     setError("");
     try {
-      await axios.post(`${getUrl()}/api/trips/${id}/chat`, { text: input });
+      await axios.post(
+        `${getUrl()}/api/trips/chat/${id}`,
+        { message: input },
+        {
+          headers: {
+            Authorization: `Bearer ${auth}`,
+          },
+        },
+      );
       setInput("");
       fetchChat();
     } catch (_err) {
@@ -69,9 +108,10 @@ export default function TripChat() {
           messages.map((msg, idx) => (
             <View key={idx} style={styles.message}>
               <Text style={styles.sender}>
-                {msg.sender?.name || "Usuario"}:
+                {msg.user.name + " " + msg.user.surname || "Usuario"}
+                {msg.isDriver ? " (conductor)" : ""}:
               </Text>
-              <Text>{msg.text}</Text>
+              <Text>{msg.message}</Text>
             </View>
           ))
         )}
