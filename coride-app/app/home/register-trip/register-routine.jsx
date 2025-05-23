@@ -25,12 +25,24 @@ export default function RegisterRoutine() {
   const [dateStart, setDateStart] = useState(new Date());
   const [dateEnd, setDateEnd] = useState(new Date());
   const [days, setDays] = useState([]);
+  //LA HORA VA A SER ALMACENADA JUNTO A DATESTART Y END, LA HORA DE ESA FECHA VA A SER LA HORA ELEGIDA EN TIMESTART... PARA QUE ESTO SUCEDA CUANDO PONGO CONTINUAR DEBE CONCATENARSE
+  //O SOBREESCRIBIR LA HORA QUE ESTA EN DATESTART Y END PERO NO SE VE CON LA HORA ELEGIDA EN TIMESTART
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timeStart, setTimeStart] = useState(new Date());
 
   const onChangeDateStart = (event) => {
     setShowDatePickerStart(false);
 
     if (event) {
       setDateStart(event);
+    }
+  };
+
+  const onChangeTime = (event) => {
+    setShowTimePicker(false);
+
+    if (event) {
+      setTimeStart(event);
     }
   };
 
@@ -44,6 +56,13 @@ export default function RegisterRoutine() {
 
   const formatDate = (date) => {
     return date.toLocaleDateString("es-AR");
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const handleRegistrarDistancia = () => {
@@ -92,6 +111,20 @@ export default function RegisterRoutine() {
         mode="date"
         onConfirm={onChangeDateEnd}
         onCancel={() => setShowDatePickerEnd(false)}
+        isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+      />
+
+      <Text style={styles.label}>Selecciona la hora del viaje:</Text>
+      <Button
+        title={formatTime(timeStart)}
+        onPress={() => setShowTimePicker(true)}
+      />
+      <DateTimePickerModal
+        isVisible={showTimePicker}
+        time={timeStart}
+        mode="time"
+        onConfirm={onChangeTime}
+        onCancel={() => setShowTimePicker(false)}
         isDarkModeEnabled={Appearance.getColorScheme() === "light"}
       />
 

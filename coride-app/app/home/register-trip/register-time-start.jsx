@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 
 export default function SelectTimeStart() {
   const [timeStart, setTimeStart] = useState(new Date());
+  const [dateStart, setDateStart] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function SelectTimeStart() {
 
   const onChangeTime = (event) => {
     setShowTimePicker(false);
+
+    console.log("onChangeTime", event);
 
     if (event) {
       setTimeStart(event);
@@ -30,8 +33,10 @@ export default function SelectTimeStart() {
   const onChangeDate = (event) => {
     setShowDatePicker(false);
 
+    console.log("onChangeDate", event);
+
     if (event) {
-      setTimeStart(event);
+      setDateStart(event);
     }
   };
 
@@ -46,11 +51,17 @@ export default function SelectTimeStart() {
   const handleContinuar = () => {
     //Guardar en useTrip
     //SI ES RUTINA SE GUARDA EN RUTINA CON UNA VARIABLE isRoutine en true para que server cree la rutina (crear los x objetos hasta que se llegue a la fecha)
-    console.log("fecha y hora elegida", timeStart);
+    console.log("fecha y hora elegida", timeStart, dateStart);
+
+    //poner en dateStart las horas y minutos elegidos en timeStart
+    const newDateStart = dateStart; //como es un hook creo una copia
+
+    newDateStart.setHours(timeStart.getHours());
+    newDateStart.setMinutes(timeStart.getMinutes());
 
     const newTrip = {
       ...trip,
-      date: timeStart,
+      date: newDateStart,
     };
 
     console.log("new trip en seleccionar fecha y hora", newTrip);
@@ -78,12 +89,12 @@ export default function SelectTimeStart() {
       />
       <Text style={styles.label}>Selecciona la fecha del viaje:</Text>
       <Button
-        title={formatDate(timeStart)}
+        title={formatDate(dateStart)}
         onPress={() => setShowDatePicker(true)}
       />
       <DateTimePickerModal
         isVisible={showDatePicker}
-        time={timeStart}
+        time={dateStart}
         mode="date"
         onConfirm={onChangeDate}
         onCancel={() => setShowDatePicker(false)}
