@@ -49,7 +49,7 @@ const functionalButtons = [
   {
     id: "7",
     title: "Próximo viaje",
-    icon: "⏰",
+    icon: "🙋‍♂️",
     route: "home/next-trip",
   },
 ];
@@ -63,14 +63,11 @@ const HomeScreen = () => {
 
   const handleFunctionPress = (route) => {
     console.log("route", route);
-
-    //router.navigate(route);
     router.push(route);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with profile picture */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.headerTitle}>Inicio</Text>
@@ -88,13 +85,11 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Welcome message */}
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>¡Bienvenido!</Text>
         <Text style={styles.subText}>¿Qué te gustaría hacer hoy?</Text>
       </View>
 
-      {/* Middle section with functional buttons */}
       <ScrollView contentContainerStyle={styles.functionContainer}>
         {functionalButtons.map((button) => (
           <TouchableOpacity
@@ -115,6 +110,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+    marginTop: 20,
   },
   header: {
     flexDirection: "row",
