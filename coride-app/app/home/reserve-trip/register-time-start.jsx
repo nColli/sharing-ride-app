@@ -1,9 +1,11 @@
 import { styles } from "../../../utils/styles";
 import { useReserve } from "./ReserveContext";
-import { View, Text, Button, Appearance } from "react-native";
+import { View, Text, Button, Appearance, Alert } from "react-native";
 import { useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useRouter } from "expo-router";
+import { createReserve } from "../../../utils/createReserve";
+import { useAuth } from "../../AuthContext";
 
 export default function SelectTimeStart() {
   const [timeStart, setTimeStart] = useState(new Date());
@@ -12,6 +14,7 @@ export default function SelectTimeStart() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const router = useRouter();
   const { reserve, setReserve } = useReserve();
+  const { auth } = useAuth();
 
   const onChangeTime = (event) => {
     setShowTimePicker(false);
@@ -44,12 +47,9 @@ export default function SelectTimeStart() {
     router.navigate("home/reserve-trip/register-routine");
   };
 
-  const handleContinuar = () => {
-    //Guardar en useTrip
-    //SI ES RUTINA SE GUARDA EN RUTINA CON UNA VARIABLE isRoutine en true para que server cree la rutina (crear los x objetos hasta que se llegue a la fecha)
+  const handleContinuar = async () => {
     console.log("fecha y hora elegida", timeStart, dateStart);
 
-    //poner en copyDateStart la hora y minutos elegidos en timeStart
     const copyDateStart = dateStart;
     copyDateStart.setHours(timeStart.getHours());
     copyDateStart.setMinutes(timeStart.getMinutes());
@@ -62,11 +62,25 @@ export default function SelectTimeStart() {
       isRoutine: false,
     };
 
-    console.log("new trip en seleccionar fecha y hora", newReserve);
+    //hacer petición a server para crear la reserva, si es rutina, se creaen register-routine
+    const responseServer = await createReserve(newReserve, auth);
 
-    setReserve(newReserve);
-
-    router.navigate("home/reserve-trip/confirm-reserve");
+    if (responseServer === null) {
+      //si es null es xq no se ha encontrado reservas o hay error en el servidor
+      //se asume que no se ha encontrado reservas
+      Alert.alert("Reserva no registrada", "No se ha encontrado reservas", [
+        {
+          texto: "Ok",
+          onPress: () => router.navigate("/home"),
+        },
+      ]);
+      return;
+    } else {
+      const newReserveServer = responseServer.reserve;
+      console.log("newReserveServer", newReserveServer);
+      setReserve(newReserveServer);
+      router.navigate("home/reserve-trip/confirm-reserve");
+    }
   };
 
   return (
