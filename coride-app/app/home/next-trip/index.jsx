@@ -10,31 +10,75 @@ import {
 import axios from "axios";
 import getUrl from "../../../utils/url";
 import { useRouter } from "expo-router";
+import { useAuth } from "../../AuthContext";
+
+const findNextTrip = (trips) => {
+  if (!trips || trips.length === 0) return null;
+
+  return trips.reduce((earliest, current) => {
+    if (!earliest) return current;
+    if (!current.dateStart) return earliest;
+    return new Date(current.dateStart) < new Date(earliest.dateStart)
+      ? current
+      : earliest;
+  }, null);
+};
 
 export default function NextTrip() {
   const [loading, setLoading] = useState(true);
   const [isDriver, setIsDriver] = useState(false);
   const [trip, setTrip] = useState(null);
+  const [reserve, setReserve] = useState(null);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { auth } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError("");
+      const token = auth;
       try {
-        // Check if user has a vehicle
-        const vehicleRes = await axios.get(`${getUrl()}/api/vehicles`);
-        if (vehicleRes.data && vehicleRes.data.vehicle) {
+        // si usuario es conductor, busco el proximo viaje donde sea conductor
+        const vehicleRes = await axios.get(`${getUrl()}/api/vehicles`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (vehicleRes.data) {
           setIsDriver(true);
-          // Fetch first trip for driver
-          const tripRes = await axios.get(`${getUrl()}/api/trips/first`);
-          setTrip(tripRes.data.trip);
-        } else {
+          const tripRes = await axios.get(`${getUrl()}/api/trips/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const trips = tripRes.data;
+          const nextTrip = findNextTrip(trips);
+          setTrip(nextTrip);
+        }
+
+        //si no es conductor, busco proxima reserva O si no tiene ningun viaje como conductor pendiente
+        if (!vehicleRes.data || vehicleRes.data.length === 0) {
           setIsDriver(false);
-          // Fetch first reserve for passenger
-          const reserveRes = await axios.get(`${getUrl()}/api/reserves/first`);
-          setTrip(reserveRes.data.reserve);
+          const reserveRes = await axios.get(`${getUrl()}/api/reserves/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const reserves = reserveRes.data;
+          const nextReserve = findNextTrip(reserves); //es el mismo algoritmo aunque sea reserva
+
+          const tripOfNextReserve = await axios.get(
+            `${getUrl()}/api/trips/${nextReserve.trip}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+
+          setReserve(nextReserve);
+          setTrip(tripOfNextReserve.data); //lo uso igual porque si es reserva muestro UI diferente
         }
       } catch (_err) {
         setError("Error al cargar los datos");
@@ -43,6 +87,7 @@ export default function NextTrip() {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -70,7 +115,6 @@ export default function NextTrip() {
   }
 
   if (isDriver) {
-    // Driver UI
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Próximo Viaje</Text>
@@ -95,14 +139,14 @@ export default function NextTrip() {
         <Button
           title="Acceder al chat"
           onPress={() => {
-            /* Navegar al chat */
+            router.push(`/home/chat/${trip._id}`);
           }}
         />
         <Button
           title="Eliminar viaje"
           color="#d00"
           onPress={() => {
-            /* Eliminar viaje */
+            router.push(`/home/delete-trip/${trip._id}`);
           }}
         />
         <Button
@@ -114,25 +158,32 @@ export default function NextTrip() {
       </ScrollView>
     );
   } else {
-    // Passenger UI
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Próximo Viaje</Text>
         <View style={styles.row}>
           <Text>Fecha: </Text>
-          <Text>{trip.dateStart ? trip.dateStart.split("T")[0] : "-"}</Text>
+          <Text>
+            {reserve.dateStart ? reserve.dateStart.split("T")[0] : "-"}
+          </Text>
           <Text> Hora inicio: </Text>
           <Text>
-            {trip.dateStart ? trip.dateStart.split("T")[1]?.slice(0, 5) : "-"}
+            {reserve.dateStart
+              ? reserve.dateStart.split("T")[1]?.slice(0, 5)
+              : "-"}
           </Text>
         </View>
         <Text>Dirección de origen:</Text>
         <Text>
-          {trip.placeStart && trip.placeStart.name ? trip.placeStart.name : "-"}
+          {reserve.placeStart && reserve.placeStart.name
+            ? reserve.placeStart.name
+            : "-"}
         </Text>
         <Text>Dirección de destino:</Text>
         <Text>
-          {trip.placeEnd && trip.placeEnd.name ? trip.placeEnd.name : "-"}
+          {reserve.placeEnd && reserve.placeEnd.name
+            ? reserve.placeEnd.name
+            : "-"}
         </Text>
         <View style={styles.row}>
           <Text>Deberás pagar: </Text>
@@ -145,20 +196,20 @@ export default function NextTrip() {
         <Button
           title="Acceder al chat"
           onPress={() => {
-            /* Navegar al chat */
+            router.push(`/home/chat/${trip._id}`);
           }}
         />
         <Button
           title="Eliminar viaje"
           color="#d00"
           onPress={() => {
-            /* Eliminar viaje */
+            router.push(`/home/delete-reserve/${trip._id}`);
           }}
         />
         <Button
           title="Volver"
           onPress={() => {
-            /* Volver */
+            router.push("/home");
           }}
         />
       </ScrollView>

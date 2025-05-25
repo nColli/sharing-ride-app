@@ -87,7 +87,12 @@ export default function SelectStartPlace() {
   };
 
   function isPlaceEmpty() {
-    if (place.city === "" || place.province === "" || place.street === "" || place.number === "") {
+    if (
+      place.city === "" ||
+      place.province === "" ||
+      place.street === "" ||
+      place.number === ""
+    ) {
       return false;
     }
 
@@ -107,7 +112,6 @@ export default function SelectStartPlace() {
       console.log("new trip en seleccionar lugar de partida", newTrip);
 
       setTrip(newTrip);
-
     } else {
       console.log("lugar nuevo elegido", place);
 

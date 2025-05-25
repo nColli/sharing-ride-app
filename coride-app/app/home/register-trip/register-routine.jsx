@@ -113,81 +113,79 @@ export default function RegisterRoutine() {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Registrar rutina</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Registrar rutina</Text>
 
-        <Text style={styles.label}>Fecha de inicio de la rutina</Text>
-        <Button
-          title={formatDate(dateStart)}
-          onPress={() => setShowDatePickerStart(true)}
-        />
-        <DateTimePickerModal
-          isVisible={showDatePickerStart}
-          time={dateStart}
-          mode="date"
-          onConfirm={onChangeDateStart}
-          onCancel={() => setShowDatePickerStart(false)}
-          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-        />
+      <Text style={styles.label}>Fecha de inicio de la rutina</Text>
+      <Button
+        title={formatDate(dateStart)}
+        onPress={() => setShowDatePickerStart(true)}
+      />
+      <DateTimePickerModal
+        isVisible={showDatePickerStart}
+        time={dateStart}
+        mode="date"
+        onConfirm={onChangeDateStart}
+        onCancel={() => setShowDatePickerStart(false)}
+        isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+      />
 
-        <Text style={styles.label}>Fecha de fin de la rutina</Text>
-        <Button
-          title={formatDate(dateEnd)}
-          onPress={() => setShowDatePickerEnd(true)}
-        />
-        <DateTimePickerModal
-          isVisible={showDatePickerEnd}
-          time={dateEnd}
-          mode="date"
-          onConfirm={onChangeDateEnd}
-          onCancel={() => setShowDatePickerEnd(false)}
-          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-        />
+      <Text style={styles.label}>Fecha de fin de la rutina</Text>
+      <Button
+        title={formatDate(dateEnd)}
+        onPress={() => setShowDatePickerEnd(true)}
+      />
+      <DateTimePickerModal
+        isVisible={showDatePickerEnd}
+        time={dateEnd}
+        mode="date"
+        onConfirm={onChangeDateEnd}
+        onCancel={() => setShowDatePickerEnd(false)}
+        isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+      />
 
-        <Text style={styles.label}>Selecciona la hora del viaje:</Text>
-        <Button
-          title={formatTime(timeStart)}
-          onPress={() => setShowTimePicker(true)}
-        />
-        <DateTimePickerModal
-          isVisible={showTimePicker}
-          time={timeStart}
-          mode="time"
-          onConfirm={onChangeTime}
-          onCancel={() => setShowTimePicker(false)}
-          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-        />
+      <Text style={styles.label}>Selecciona la hora del viaje:</Text>
+      <Button
+        title={formatTime(timeStart)}
+        onPress={() => setShowTimePicker(true)}
+      />
+      <DateTimePickerModal
+        isVisible={showTimePicker}
+        time={timeStart}
+        mode="time"
+        onConfirm={onChangeTime}
+        onCancel={() => setShowTimePicker(false)}
+        isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+      />
 
-        <MultiSelect
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          search
-          data={data}
-          labelField="label"
-          valueField="value"
-          placeholder="Seleccionar días"
-          searchPlaceholder="Buscar..."
-          value={days}
-          onChange={(item) => {
-            setDays(item);
-          }}
-          renderLeftIcon={() => (
-            <AntDesign
-              style={styles.icon}
-              color="black"
-              name="Safety"
-              size={20}
-            />
-          )}
-          selectedStyle={styles.selectedStyle}
-        />
+      <MultiSelect
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        search
+        data={data}
+        labelField="label"
+        valueField="value"
+        placeholder="Seleccionar días"
+        searchPlaceholder="Buscar..."
+        value={days}
+        onChange={(item) => {
+          setDays(item);
+        }}
+        renderLeftIcon={() => (
+          <AntDesign
+            style={styles.icon}
+            color="black"
+            name="Safety"
+            size={20}
+          />
+        )}
+        selectedStyle={styles.selectedStyle}
+      />
 
-        <Button title="Continuar" onPress={handleRegistrarDistancia} />
-      </View>
-    </ScrollView>
+      <Button title="Continuar" onPress={handleRegistrarDistancia} />
+    </View>
   );
 }

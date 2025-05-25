@@ -60,6 +60,7 @@ export default function ConfirmReserve() {
       })
       .then((response) => {
         const res = response.data;
+        console.log("respuesta al registrar la reserva", res);
         if (res.error) {
           reserveNotCompleted();
         } else if (reserve.isRoutine) {
@@ -67,7 +68,7 @@ export default function ConfirmReserve() {
           setReserve(res.reserves);
         } else {
           setReserveFinded(true);
-          const reserves = [];
+          let reserves = [];
           reserves = reserves.concat(res.reserve);
           setReserve(reserves);
 
@@ -75,7 +76,7 @@ export default function ConfirmReserve() {
             console.log("mensaje del servidor", res.message);
             Alert.alert(
               "Alerta",
-              "No se han podido reservas todos los viajes, revise en la pestaña de proximos viajes",
+              "No ha sido posible reservar todos los viajes, revise en la pestaña de proximos viajes",
             );
           }
         }

@@ -28,7 +28,7 @@ export default function RootLayout() {
         name="pending-reserves"
         options={{ title: "Reservas de viajes" }}
       />
-      <Stack.Screen name="chat/[id]" options={{ title: "chat" }} />
+      <Stack.Screen name="next-trip" options={{ title: "Proximo viaje" }} />
     </Stack>
   );
 }

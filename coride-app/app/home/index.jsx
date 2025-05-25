@@ -46,6 +46,12 @@ const functionalButtons = [
     icon: "⏰",
     route: "home/pending-reserves",
   },
+  {
+    id: "7",
+    title: "Próximo viaje",
+    icon: "⏰",
+    route: "home/next-trip",
+  },
 ];
 
 const HomeScreen = () => {

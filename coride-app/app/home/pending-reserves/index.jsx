@@ -44,6 +44,7 @@ export default function PendingReserves() {
         );
         router.push("/home");
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
