@@ -13,6 +13,8 @@ import { useState } from "react";
 import { styles } from "../../../utils/styles";
 import { MultiSelect } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { createReserve } from "../../../utils/createReserve";
+import { useAuth } from "../../AuthContext";
 
 const data = [
   { label: "Domingo", value: "Sunday" },
@@ -34,6 +36,7 @@ export default function RegisterRoutine() {
   const [days, setDays] = useState([]);
   const [timeStart, setTimeStart] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const { auth } = useAuth();
 
   const onChangeDateStart = (event) => {
     setShowDatePickerStart(false);
@@ -72,7 +75,7 @@ export default function RegisterRoutine() {
     });
   };
 
-  const handleRegistrarDistancia = () => {
+  const handleRegistrarDistancia = async () => {
     if (days.length === 0) {
       Alert.alert("Error", "Seleccione los días para registrar la rutina");
       return;
@@ -97,7 +100,19 @@ export default function RegisterRoutine() {
       days,
     };
 
-    setReserve(newReserve);
+    const newReserveServer = await createReserve(newReserve, auth);
+
+    if (newReserveServer === null) {
+      Alert.alert("Error", "No se ha podido crear la rutina", [
+        {
+          texto: "Ok",
+          onPress: () => router.navigate("/home"),
+        },
+      ]);
+      return;
+    }
+
+    setReserve(newReserveServer);
 
     router.navigate("home/reserve-trip/confirm-reserve");
   };
