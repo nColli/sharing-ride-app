@@ -86,6 +86,7 @@ export default function DeleteTrip() {
     };
 
     fetchTrip();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDelete = async () => {

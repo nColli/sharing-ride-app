@@ -4,13 +4,14 @@ import {
   Text,
   Button,
   ActivityIndicator,
-  ScrollView,
   StyleSheet,
 } from "react-native";
 import axios from "axios";
 import getUrl from "../../../utils/url";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../AuthContext";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const findNextTrip = (trips) => {
   if (!trips || trips.length === 0) return null;
@@ -35,7 +36,6 @@ export default function NextTrip() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       setError("");
       const token = auth;
       try {
@@ -77,7 +77,12 @@ export default function NextTrip() {
             },
           );
 
-          setReserve(nextReserve);
+          const nextReserveWithCost = {
+            ...nextReserve,
+            tripCost: tripOfNextReserve.data.tripCost,
+          };
+
+          setReserve(nextReserveWithCost);
           setTrip(tripOfNextReserve.data); //lo uso igual porque si es reserva muestro UI diferente
         }
       } catch (_err) {
@@ -92,7 +97,7 @@ export default function NextTrip() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -100,7 +105,7 @@ export default function NextTrip() {
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <Text>{error}</Text>
       </View>
     );
@@ -108,34 +113,59 @@ export default function NextTrip() {
 
   if (!trip) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.container}>
         <Text>No hay viajes o reservas próximos.</Text>
       </View>
     );
   }
 
-  if (isDriver) {
-    return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Próximo Viaje</Text>
-        <View style={styles.row}>
-          <Text>Fecha: </Text>
-          <Text>{trip.dateStart ? trip.dateStart.split("T")[0] : "-"}</Text>
-          <Text> Hora inicio: </Text>
-          <Text>
-            {trip.dateStart ? trip.dateStart.split("T")[1]?.slice(0, 5) : "-"}
+  const displayData = isDriver ? trip : reserve;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Próximo Viaje</Text>
+      <View style={styles.infoContainer}>
+        <View style={styles.dateRow}>
+          <Text style={styles.label}>Fecha:</Text>
+          <Text style={styles.value}>
+            {format(new Date(displayData.dateStart), "yyyy/MM/dd")}
           </Text>
         </View>
-        <Text>Origen:</Text>
-        <Text>
-          {trip.placeStart && trip.placeStart.name ? trip.placeStart.name : "-"}
+
+        <View style={styles.timeRow}>
+          <Text style={styles.label}>Hora inicio:</Text>
+          <Text style={styles.value}>
+            {format(new Date(displayData.dateStart), "HH:mm a", { locale: es })}
+          </Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Ruta del viaje:</Text>
+        <View style={styles.locationRow}>
+          <Text style={styles.label}>Origen:</Text>
+          <Text style={styles.value}>
+            {displayData.placeStart?.name || "-"}
+          </Text>
+        </View>
+
+        <View style={styles.locationRow}>
+          <Text style={styles.label}>Destino:</Text>
+          <Text style={styles.value}>{displayData.placeEnd?.name || "-"}</Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>
+          {isDriver ? "Cada pasajero debe pagarte:" : "Deberás pagar:"}
         </Text>
-        <Text>Destino:</Text>
-        <Text>
-          {trip.placeEnd && trip.placeEnd.name ? trip.placeEnd.name : "-"}
-        </Text>
-        <Text style={styles.payText}>Cada pasajero debe pagarte:</Text>
-        <Text style={styles.amount}>$ {trip.tripCost || "-"}</Text>
+        <Text style={styles.costValue}>$ {displayData.tripCost || "-"}</Text>
+
+        {!isDriver && (
+          <Text style={styles.info}>
+            El pago lo arreglás con el conductor por el chat o al momento de
+            terminar el viaje
+          </Text>
+        )}
+      </View>
+
+      <View style={styles.buttonContainer}>
         <Button
           title="Acceder al chat"
           onPress={() => {
@@ -144,9 +174,11 @@ export default function NextTrip() {
         />
         <Button
           title="Eliminar viaje"
-          color="#d00"
+          color="#FF3B30"
           onPress={() => {
-            router.push(`/home/delete-trip/${trip._id}`);
+            router.push(
+              `/home/delete-${isDriver ? "trip" : "reserve"}/${trip._id}`,
+            );
           }}
         />
         <Button
@@ -155,111 +187,75 @@ export default function NextTrip() {
             router.push("/home");
           }}
         />
-      </ScrollView>
-    );
-  } else {
-    return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Próximo Viaje</Text>
-        <View style={styles.row}>
-          <Text>Fecha: </Text>
-          <Text>
-            {reserve.dateStart ? reserve.dateStart.split("T")[0] : "-"}
-          </Text>
-          <Text> Hora inicio: </Text>
-          <Text>
-            {reserve.dateStart
-              ? reserve.dateStart.split("T")[1]?.slice(0, 5)
-              : "-"}
-          </Text>
-        </View>
-        <Text>Dirección de origen:</Text>
-        <Text>
-          {reserve.placeStart && reserve.placeStart.name
-            ? reserve.placeStart.name
-            : "-"}
-        </Text>
-        <Text>Dirección de destino:</Text>
-        <Text>
-          {reserve.placeEnd && reserve.placeEnd.name
-            ? reserve.placeEnd.name
-            : "-"}
-        </Text>
-        <View style={styles.row}>
-          <Text>Deberás pagar: </Text>
-          <Text style={styles.amount}>$ {trip.tripCost || "-"}</Text>
-        </View>
-        <Text style={styles.info}>
-          El pago lo arreglás con el conductor por el chat o al momento de
-          terminar el viaje
-        </Text>
-        <Button
-          title="Acceder al chat"
-          onPress={() => {
-            router.push(`/home/chat/${trip._id}`);
-          }}
-        />
-        <Button
-          title="Eliminar viaje"
-          color="#d00"
-          onPress={() => {
-            router.push(`/home/delete-reserve/${trip._id}`);
-          }}
-        />
-        <Button
-          title="Volver"
-          onPress={() => {
-            router.push("/home");
-          }}
-        />
-      </ScrollView>
-    );
-  }
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    flexGrow: 1,
-    backgroundColor: "#fff",
-    alignItems: "stretch",
-  },
-  centered: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    padding: 20,
+    backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: "center",
   },
-  subtitle: {
-    fontWeight: "bold",
-    marginTop: 10,
+  infoContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  row: {
+  dateRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  payText: {
-    marginTop: 10,
+  timeRow: {
+    flexDirection: "row",
+    marginBottom: 10,
   },
-  amount: {
-    fontWeight: "bold",
+  locationRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginRight: 10,
+    minWidth: 100,
+  },
+  value: {
+    fontSize: 16,
+    flex: 1,
+  },
+  costValue: {
     fontSize: 18,
-    marginBottom: 10,
+    fontWeight: "bold",
+    color: "#007AFF",
   },
-  link: {
-    color: "#1976d2",
-    textDecorationLine: "underline",
-    marginBottom: 10,
+  buttonContainer: {
+    gap: 10,
   },
   info: {
-    marginVertical: 10,
+    marginTop: 10,
     fontSize: 13,
     color: "#333",
   },
