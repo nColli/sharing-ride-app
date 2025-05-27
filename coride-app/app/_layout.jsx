@@ -6,8 +6,15 @@ export default function RootLayout() {
     <AuthProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-
         <Stack.Screen name="home" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="resetpassword"
+          options={{ title: "Resetear contraseña" }}
+        />
+        <Stack.Screen
+          name="createaccount"
+          options={{ title: "Crear cuenta" }}
+        />
       </Stack>
     </AuthProvider>
   );
