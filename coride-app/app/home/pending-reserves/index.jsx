@@ -67,7 +67,7 @@ const ContainerTrip = ({ reserve }) => {
   };
 
   const handleDeleteReserve = () => {
-    router.push("/home/delete/" + reserve._id);
+    router.push("/home/delete-trip/" + reserve.trip);
   };
 
   return (

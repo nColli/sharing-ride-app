@@ -7,7 +7,12 @@ import {
   Button,
   ScrollView,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import getUrl from "../../../utils/url";
 import { useAuth } from "../../AuthContext";
@@ -92,44 +97,54 @@ export default function TripChat() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Chat del Viaje</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button title="Recargar" onPress={fetchChat} />
-      <ScrollView
-        style={styles.chatBox}
-        contentContainerStyle={{ paddingBottom: 20 }}
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 25}
       >
-        {loading ? (
-          <Text>Cargando...</Text>
-        ) : messages.length === 0 ? (
-          <Text>No hay mensajes.</Text>
-        ) : (
-          messages.map((msg, idx) => (
-            <View key={idx} style={styles.message}>
-              <Text style={styles.sender}>
-                {msg.user.name + " " + msg.user.surname || "Usuario"}
-                {msg.isDriver ? " (conductor)" : ""}:
-              </Text>
-              <Text>{msg.message}</Text>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Chat del Viaje</Text>
+            {error ? <Text style={styles.error}>{error}</Text> : null}
+            <Button title="Recargar" onPress={fetchChat} />
+            <ScrollView
+              style={styles.chatBox}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            >
+              {loading ? (
+                <Text>Cargando...</Text>
+              ) : messages.length === 0 ? (
+                <Text>No hay mensajes.</Text>
+              ) : (
+                messages.map((msg, idx) => (
+                  <View key={idx} style={styles.message}>
+                    <Text style={styles.sender}>
+                      {msg.user.name + " " + msg.user.surname || "Usuario"}
+                      {msg.isDriver ? " (conductor)" : ""}:
+                    </Text>
+                    <Text>{msg.message}</Text>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                value={input}
+                onChangeText={setInput}
+                placeholder="Escribe un mensaje..."
+              />
+              <Button
+                title="Enviar"
+                onPress={sendMessage}
+                disabled={sending || !input.trim()}
+              />
             </View>
-          ))
-        )}
-      </ScrollView>
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          value={input}
-          onChangeText={setInput}
-          placeholder="Escribe un mensaje..."
-        />
-        <Button
-          title="Enviar"
-          onPress={sendMessage}
-          disabled={sending || !input.trim()}
-        />
-      </View>
-    </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -171,6 +186,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 8,
+    marginBottom: 80,
   },
   input: {
     flex: 1,

@@ -27,6 +27,7 @@ export default function PendingTrips() {
       .catch((error) => {
         console.log("error", error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -50,7 +51,7 @@ const ContainerTrip = ({ trip }) => {
   };
 
   const handleDeleteTrip = () => {
-    router.push("/home/delete/" + trip._id);
+    router.push("/home/delete-trip/" + trip._id);
   };
 
   return (

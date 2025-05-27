@@ -83,7 +83,7 @@ export default function NextTrip() {
           };
 
           setReserve(nextReserveWithCost);
-          setTrip(tripOfNextReserve.data); //lo uso igual porque si es reserva muestro UI diferente
+          setTrip(tripOfNextReserve.data);
         }
       } catch (_err) {
         setError("Error al cargar los datos");
@@ -176,9 +176,7 @@ export default function NextTrip() {
           title="Eliminar viaje"
           color="#FF3B30"
           onPress={() => {
-            router.push(
-              `/home/delete-${isDriver ? "trip" : "reserve"}/${trip._id}`,
-            );
+            router.push(`/home/delete-trip/${trip._id}`);
           }}
         />
         <Button
