@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { styles } from "../../utils/styles";
+import { useAuth } from "../AuthContext";
 
 import LoadingOverlay from "../../components/LoadingOverlay";
 import useLoading from "../../custom_hooks/useLoading";
@@ -29,6 +30,7 @@ export default function PhotoUploadScreen() {
   const [photos, setPhotos] = useState([null, null, null]);
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
+  const { setAuth } = useAuth();
 
   const requestPermissions = async () => {
     const { status: cameraStatus } =
@@ -104,22 +106,7 @@ export default function PhotoUploadScreen() {
 
     console.log("token", authToken);
 
-    await AsyncStorage.setItem("authToken", authToken)
-      .then(() => {
-        console.log("email saved");
-      })
-      .catch((error) => {
-        console.log("error saving email", error);
-      });
-
-    await AsyncStorage.getItem("authToken")
-      .then((t) => {
-        console.log("token from async", t);
-      })
-      .catch((error) => {
-        console.log("error getting item", error);
-        return;
-      });
+    setAuth(authToken);
   };
 
   const handleUpload = async () => {

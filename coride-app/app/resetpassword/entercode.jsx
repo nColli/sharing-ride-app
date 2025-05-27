@@ -7,9 +7,11 @@ import { styles } from "../../utils/styles";
 
 import LoadingOverlay from "../../components/LoadingOverlay";
 import useLoading from "../../custom_hooks/useLoading";
+import { useAuth } from "../AuthContext";
 
 export default function Entercode() {
   const { isLoading, withLoading } = useLoading();
+  const { setAuth } = useAuth();
 
   const [token, setToken] = useState("");
   const [email, setEmail] = useState("");
@@ -26,22 +28,7 @@ export default function Entercode() {
 
     console.log("token", authToken);
 
-    await AsyncStorage.setItem("authToken", authToken)
-      .then(() => {
-        console.log("email saved");
-      })
-      .catch((error) => {
-        console.log("error saving email", error);
-      });
-
-    await AsyncStorage.getItem("authToken")
-      .then((t) => {
-        console.log("token from async", t);
-      })
-      .catch((error) => {
-        console.log("error getting item", error);
-        return;
-      });
+    setAuth(authToken);
   };
 
   const navigateToIndex = () => {

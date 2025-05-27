@@ -57,7 +57,7 @@ export default function Newpassword() {
   };
 
   const goToHome = () => {
-    router.navigate("../home");
+    router.navigate("/home");
   };
 
   return (
