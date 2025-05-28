@@ -58,7 +58,7 @@ const HomeScreen = () => {
   const router = useRouter();
 
   const handleProfilePress = () => {
-    router.push("/user-management");
+    router.push("/home/user-management");
   };
 
   const handleFunctionPress = (route) => {

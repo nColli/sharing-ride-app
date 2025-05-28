@@ -1,14 +1,13 @@
 import { View, Text, Button, Alert } from "react-native";
 import { styles } from "../../../utils/styles";
 import { Picker } from "@react-native-picker/picker";
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import getURL from "../../../utils/url";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useTrip } from "./TripContext";
 import { useAuth } from "../../AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
-import React from "react";
 
 export default function SelectVehicle() {
   const { auth } = useAuth();
@@ -18,7 +17,7 @@ export default function SelectVehicle() {
   const router = useRouter();
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       const url = getURL() + "/api/vehicles"; //obt vehiculos del usuario
 
       const token = auth;
@@ -32,13 +31,16 @@ export default function SelectVehicle() {
           },
         })
         .then((response) => {
-          setVehicles(response.data);
+          const vehiclesList = response.data;
+          setVehicles(vehiclesList);
+          setSelectedVehicle(vehiclesList[0]); //selecciona el primero - prob. de que user seleccione el primero o tenga un vehiculo es alta
         })
         .catch((error) => {
           console.log("error al obtener lugares");
           //redireccionar a home con aviso de que lo intente de nuevo
           Alert.alert("Error del servidor", "Pruebe reiniciando la aplicación");
         });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
 
@@ -48,7 +50,7 @@ export default function SelectVehicle() {
   }
 
   const handleRegisterVehicle = () => {
-    router.navigate("home/register-vehicle"); //dsp hacer que cuando se registra vehiculo se retorne aca y no a home, marcar de donde proviene con context general
+    router.navigate("home/register-vehicle"); //cuando se registra vehiculo se retorne aca y no a home,
   };
 
   const handleContinue = () => {

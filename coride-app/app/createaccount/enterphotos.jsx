@@ -12,14 +12,15 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { styles } from "../../utils/styles";
 import { useAuth } from "../AuthContext";
+import { useUser } from "./UserContext";
 
 import LoadingOverlay from "../../components/LoadingOverlay";
 import useLoading from "../../custom_hooks/useLoading";
+import getUrl from "../../utils/url";
 
 const { width } = Dimensions.get("window");
 const PHOTO_CONTAINER_SIZE = width * 0.4; // 40% del ancho de pantalla
@@ -31,6 +32,9 @@ export default function PhotoUploadScreen() {
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
   const { setAuth } = useAuth();
+  const { user } = useUser();
+
+  console.log("user", user);
 
   const requestPermissions = async () => {
     const { status: cameraStatus } =
@@ -73,34 +77,6 @@ export default function PhotoUploadScreen() {
     setPhotos(newPhotos);
   };
 
-  const getUserData = async () => {
-    const dataSaved = await AsyncStorage.multiGet([
-      "email",
-      "password",
-      "dni",
-      "nombre",
-      "apellido",
-      "fechaNacimiento",
-      "calle",
-      "numero",
-      "localidad",
-      "provincia",
-    ]);
-
-    return {
-      email: dataSaved[0][1] || "",
-      password: dataSaved[1][1] || "",
-      dni: dataSaved[2][1] || "",
-      name: dataSaved[3][1] || "",
-      surname: dataSaved[4][1] || "",
-      birthDate: dataSaved[5][1] || "",
-      street: dataSaved[6][1] || "",
-      number: dataSaved[7][1] || "",
-      city: dataSaved[8][1] || "",
-      province: dataSaved[9][1] || "",
-    };
-  };
-
   const saveUserData = async (response) => {
     const authToken = response.data.tokenLogin;
 
@@ -118,9 +94,21 @@ export default function PhotoUploadScreen() {
     setUploading(true);
     try {
       const formData = new FormData();
-      const userData = await getUserData();
 
       // Agregar datos del usuario como JSON
+      const userData = {
+        email: user.email,
+        password: user.password,
+        dni: user.dni,
+        name: user.nombre,
+        surname: user.apellido,
+        birthDate: user.fechaNacimiento,
+        street: user.address.street,
+        number: user.address.number,
+        city: user.address.locality,
+        province: user.address.province,
+      };
+
       formData.append("userData", JSON.stringify(userData));
 
       // Agregar archivos de imagen
@@ -142,17 +130,15 @@ export default function PhotoUploadScreen() {
         type: "image/jpeg",
       });
 
+      const baseUrl = getUrl();
+
       await withLoading(
         axios
-          .post(
-            "https://backend-sharing-ride-app.onrender.com/api/users",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
+          .post(`${baseUrl}/api/users`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
             },
-          )
+          })
           .then((response) => {
             saveUserData(response);
           }),
@@ -160,13 +146,22 @@ export default function PhotoUploadScreen() {
 
       Alert.alert(
         "Ya tenes tu cuenta",
-        "Tu usario ha sido creado, podes empezar a usar la app",
+        "Tu usuario ha sido creado, podes empezar a usar la app",
+        [
+          {
+            text: "OK",
+            onPress: () => router.push("/home"),
+          },
+        ],
       );
-
-      router.navigate("../home");
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Hubo un problema al crear el usuario");
+      Alert.alert("Error", "Hubo un problema al crear el usuario", [
+        {
+          text: "OK",
+          onPress: () => router.push("/"),
+        },
+      ]);
     } finally {
       setUploading(false);
     }

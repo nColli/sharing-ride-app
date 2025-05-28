@@ -17,14 +17,14 @@ export default function Login() {
       <View style={styles.button}>
         <Button
           title="¿Olvidaste tu contraseña?"
-          onPress={() => router.navigate("resetpassword")}
+          onPress={() => router.push("/resetpassword")}
         />
       </View>
 
       <View style={styles.button}>
         <Button
           title="Registrate acá"
-          onPress={() => router.navigate("createaccount")}
+          onPress={() => router.push("/createaccount")}
         />
       </View>
     </View>

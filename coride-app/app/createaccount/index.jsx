@@ -1,8 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, Text, TextInput, Button, Alert } from "react-native";
 import { styles } from "../../utils/styles";
+import { useUser } from "./UserContext";
 
 export default function Createaccount() {
   const [email, setEmail] = useState("");
@@ -11,6 +11,7 @@ export default function Createaccount() {
   const [repeatPassword, setRepeatPassword] = useState("");
 
   const router = useRouter();
+  const { setUser } = useUser();
 
   const validateEmail = (text) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,17 +52,12 @@ export default function Createaccount() {
       return;
     }
 
-    //despues de registrarse eliminar data critica
-    await AsyncStorage.multiSet([
-      ["email", email],
-      ["password", password],
-    ])
-      .then((response) => {
-        console.log("store", response);
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
+    const newUser = {
+      email,
+      password,
+    };
+
+    setUser(newUser);
 
     router.navigate("createaccount/formpersonaldata");
   };

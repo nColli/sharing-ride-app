@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -13,6 +12,8 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { styles } from "../../utils/styles";
+import { useUser } from "./UserContext";
+import { PROVINCES } from "../../utils/provinces";
 
 export default function Insertpersonaldata() {
   const [dni, setDni] = useState("");
@@ -30,6 +31,7 @@ export default function Insertpersonaldata() {
     locality: "",
     province: "",
   });
+  const { user, setUser } = useUser();
   const router = useRouter();
 
   const handleDni = (text) => {
@@ -55,33 +57,6 @@ export default function Insertpersonaldata() {
   const formatDate = (date) => {
     return date.toLocaleDateString("es-AR");
   };
-
-  const PROVINCES = [
-    "Buenos Aires",
-    "CABA",
-    "Catamarca",
-    "Chaco",
-    "Chubut",
-    "Córdoba",
-    "Corrientes",
-    "Entre Ríos",
-    "Formosa",
-    "Jujuy",
-    "La Pampa",
-    "La Rioja",
-    "Mendoza",
-    "Misiones",
-    "Neuquén",
-    "Río Negro",
-    "Salta",
-    "San Juan",
-    "San Luis",
-    "Santa Cruz",
-    "Santa Fe",
-    "Santiago del Estero",
-    "Tierra del Fuego",
-    "Tucumán",
-  ];
 
   const validateStreet = (text) => {
     const regex = /^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]{3,}$/;
@@ -126,40 +101,31 @@ export default function Insertpersonaldata() {
     return Object.values(newErrors).every((error) => error === "");
   };
 
-  const saveAddress = async () => {
-    try {
-      await AsyncStorage.multiSet([
-        ["calle", street],
-        ["numero", number],
-        ["localidad", locality],
-        ["provincia", province],
-      ]);
-    } catch (error) {
-      console.error("Error guardando dirección:", error);
-    }
-  };
-
   const handleSignup = async () => {
-    if (!dni || !nombre || !apellido || !fechaNacimiento) {
+    if (!dni || !nombre || !apellido || !fechaNacimiento || !validateForm()) {
       Alert.alert("Error", "Complete todos los campos");
       return;
     }
 
-    //despues de registrarse eliminar data critica
-    await AsyncStorage.multiSet([
-      ["dni", dni],
-      ["nombre", nombre],
-      ["apellido", apellido],
-      ["fechaNacimiento", fechaNacimiento.toISOString()],
-    ])
-      .then((response) => {
-        console.log("response store", response);
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
+    const address = {
+      street,
+      number,
+      locality,
+      province,
+    };
 
-    saveAddress();
+    const newUser = {
+      ...user,
+      dni,
+      nombre,
+      apellido,
+      fechaNacimiento: fechaNacimiento.toISOString(),
+      address,
+    };
+
+    console.log("newUser", newUser);
+
+    setUser(newUser);
 
     router.navigate("createaccount/enterphotos");
   };

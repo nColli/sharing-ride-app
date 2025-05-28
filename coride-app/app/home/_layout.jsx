@@ -29,6 +29,10 @@ export default function RootLayout() {
         options={{ title: "Reservas de viajes" }}
       />
       <Stack.Screen name="next-trip" options={{ title: "Proximo viaje" }} />
+      <Stack.Screen
+        name="user-management"
+        options={{ title: "Gestion de usuario" }}
+      />
     </Stack>
   );
 }
