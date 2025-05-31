@@ -33,6 +33,7 @@ export default function RootLayout() {
         name="user-management"
         options={{ title: "Gestion de usuario" }}
       />
+      <Stack.Screen name="start-trip" options={{ title: "Iniciar viaje" }} />
     </Stack>
   );
 }

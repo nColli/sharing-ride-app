@@ -210,6 +210,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
+  dropdownContainer: {
+    paddingVertical: 20,
+    borderWidth: 1,
+    borderColor: "#bdc3c7",
+    borderRadius: 8,
+    margin: 10,
+  },
 });
 
 export { styles };

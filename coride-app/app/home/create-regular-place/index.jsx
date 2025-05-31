@@ -13,10 +13,11 @@ import {
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../AuthContext";
+import getUrl from "../../../utils/url";
+import { PROVINCES } from "../../../utils/provinces";
+import { Picker } from "@react-native-picker/picker";
 
-const AddHabitualPlace = ({
-  apiUrl = "https://backend-sharing-ride-app.onrender.com/api/places",
-}) => {
+const AddRegularPlace = () => {
   const router = useRouter();
   const { auth } = useAuth();
 
@@ -70,6 +71,8 @@ const AddHabitualPlace = ({
 
       console.log("token para lugar regular", token);
 
+      const apiUrl = getUrl() + "/api/places";
+
       const response = await axios.post(apiUrl, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -79,7 +82,7 @@ const AddHabitualPlace = ({
       console.log("response", response.data);
 
       Alert.alert("Éxito", "Lugar agregado correctamente", [
-        { text: "OK", onPress: () => router.push("/home") }, //modificar, sacar redireccionamiento y limpiar hooks
+        { text: "OK", onPress: () => router.push("/home") },
       ]);
     } catch (error) {
       console.log("error", error);
@@ -140,14 +143,17 @@ const AddHabitualPlace = ({
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Provincia:</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.province}
-              onChangeText={(text) => handleChange("province", text)}
-              placeholder="Provincia"
-            />
+          <Text style={styles.label}>Provincia</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={formData.province}
+              onValueChange={(itemValue) => handleChange("province", itemValue)}
+            >
+              <Picker.Item label="Seleccione una provincia" value="" />
+              {PROVINCES.map((prov) => (
+                <Picker.Item key={prov} label={prov} value={prov} />
+              ))}
+            </Picker>
           </View>
 
           <TouchableOpacity
@@ -176,6 +182,12 @@ const AddHabitualPlace = ({
 };
 
 const styles = StyleSheet.create({
+  pickerContainer: {
+    borderColor: "#bdc3c7",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -236,4 +248,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddHabitualPlace;
+export default AddRegularPlace;

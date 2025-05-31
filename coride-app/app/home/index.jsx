@@ -52,6 +52,12 @@ const functionalButtons = [
     icon: "🙋‍♂️",
     route: "home/next-trip",
   },
+  {
+    id: "8",
+    title: "Iniciar viaje",
+    icon: "🚀",
+    route: "home/start-trip",
+  },
 ];
 
 const HomeScreen = () => {
