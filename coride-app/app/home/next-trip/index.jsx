@@ -5,25 +5,16 @@ import {
   Button,
   ActivityIndicator,
   StyleSheet,
+  Pressable,
+  Linking,
 } from "react-native";
-import axios from "axios";
-import getUrl from "../../../utils/url";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../AuthContext";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
-const findNextTrip = (trips) => {
-  if (!trips || trips.length === 0) return null;
-
-  return trips.reduce((earliest, current) => {
-    if (!earliest) return current;
-    if (!current.dateStart) return earliest;
-    return new Date(current.dateStart) < new Date(earliest.dateStart)
-      ? current
-      : earliest;
-  }, null);
-};
+import getNextTrip from "../../../utils/getNextTrip";
+import getNextReserve from "../../../utils/getNextReserve";
+import getUrlTrip from "../../../utils/getUrlTrip.js";
 
 export default function NextTrip() {
   const [loading, setLoading] = useState(true);
@@ -33,59 +24,35 @@ export default function NextTrip() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { auth } = useAuth();
+  const [ruta, setRuta] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       setError("");
       const token = auth;
       try {
-        // si usuario es conductor, busco el proximo viaje donde sea conductor
-        const vehicleRes = await axios.get(`${getUrl()}/api/vehicles`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (vehicleRes.data) {
+        const nextTrip = await getNextTrip(token);
+        console.log("nextTrip", nextTrip);
+
+        if (nextTrip) {
           setIsDriver(true);
-          const tripRes = await axios.get(`${getUrl()}/api/trips/`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const trips = tripRes.data;
-          const nextTrip = findNextTrip(trips);
           setTrip(nextTrip);
+
+          const rutaTrip = await getUrlTrip(nextTrip._id, token);
+
+          setRuta(rutaTrip.urlRuta);
+          console.log("ruta", rutaTrip.urlRuta);
+        } else {
+          const nextReserve = await getNextReserve(token);
+          console.log("nextReserve", nextReserve);
+          if (nextReserve) {
+            setReserve(nextReserve);
+          } else {
+            setError("No hay reservas próximas.");
+          }
         }
-
-        //si no es conductor, busco proxima reserva O si no tiene ningun viaje como conductor pendiente
-        if (!vehicleRes.data || vehicleRes.data.length === 0) {
-          setIsDriver(false);
-          const reserveRes = await axios.get(`${getUrl()}/api/reserves/`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const reserves = reserveRes.data;
-          const nextReserve = findNextTrip(reserves); //es el mismo algoritmo aunque sea reserva
-
-          const tripOfNextReserve = await axios.get(
-            `${getUrl()}/api/trips/${nextReserve.trip}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
-
-          const nextReserveWithCost = {
-            ...nextReserve,
-            tripCost: tripOfNextReserve.data.tripCost,
-          };
-
-          setReserve(nextReserveWithCost);
-          setTrip(tripOfNextReserve.data);
-        }
-      } catch (_err) {
+        // eslint-disable-next-line no-unused-vars
+      } catch (error) {
         setError("Error al cargar los datos");
       } finally {
         setLoading(false);
@@ -162,6 +129,15 @@ export default function NextTrip() {
             El pago lo arreglás con el conductor por el chat o al momento de
             terminar el viaje
           </Text>
+        )}
+
+        {isDriver && (
+          <Pressable
+            onPress={() => Linking.openURL(ruta)}
+            style={styles.pressable}
+          >
+            <Text style={styles.textPressable}>Ruta por google maps</Text>
+          </Pressable>
         )}
       </View>
 
@@ -256,5 +232,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 13,
     color: "#333",
+  },
+  pressable: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  textPressable: {
+    color: "white",
+    textAlign: "center",
   },
 });
