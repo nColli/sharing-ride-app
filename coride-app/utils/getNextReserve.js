@@ -11,7 +11,7 @@ export default async function getNextReserve(token) {
     });
     return response.data;
   } catch (error) {
-    console.error("Error al obtener la siguiente reserva:", error);
+    console.log("Error al obtener la siguiente reserva:", error);
     return null;
   }
 }

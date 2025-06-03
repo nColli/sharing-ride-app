@@ -64,8 +64,8 @@ export default function NextTrip() {
           }
         }
       } catch (error) {
-        console.error("Error al obtener array de viajes", error);
-        setError("Error al obtener los viajes");
+        console.log("Error al obtener array de viajes", error);
+        setError("No hay viajes o reservas próximos.");
       } finally {
         setLoading(false);
       }

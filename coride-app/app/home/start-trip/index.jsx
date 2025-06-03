@@ -1,45 +1,51 @@
 import {
   View,
   Text,
-  TouchableOpacity,
   ActivityIndicator,
-  ScrollView,
+  StyleSheet,
+  Button,
 } from "react-native";
-import { styles } from "../../../utils/styles";
 import { useEffect, useState } from "react";
+import { useTrip } from "./TripContext";
 import { useAuth } from "../../AuthContext";
+import getNextTrip from "../../../utils/getNextTrip";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { useRouter, Link } from "expo-router";
-import getUrlTrip from "../../../utils/getUrlTrip";
-import getNextTrip from "../../../utils/getNextTrip";
+import { useRouter } from "expo-router";
+import getTrips from "../../../utils/getTrips";
 
-export default function StartTrip() {
+export default function NextTrip() {
   const [loading, setLoading] = useState(true);
-  const [trip, setTrip] = useState(null);
-  const [reserves, setReserves] = useState([]);
   const [error, setError] = useState("");
-  const router = useRouter();
+  const { trip, setTrip } = useTrip();
   const { auth } = useAuth();
-  const [ruta, setRuta] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const nextTrip = await getNextTrip(auth);
-        console.log("nextTrip", nextTrip);
+        const getCantTrips = await getTrips(auth);
 
-        if (!nextTrip) {
-          setError("No hay ningún viaje próximo");
-          return;
+        if (getCantTrips.length > 0) {
+          const nextTrip = await getNextTrip(auth);
+
+          if (nextTrip) {
+            setTrip(nextTrip);
+          } else {
+            setError(
+              "No hay viajes programados como conductor para dentro de una hora o menos",
+            );
+          }
+        } else {
+          setError(
+            "No hay viajes programados como conductor para dentro de una hora o menos",
+          );
         }
-
-        setTrip(nextTrip);
-        setReserves(nextTrip.bookings || []);
-
-        const rutaTrip = await getUrlTrip(nextTrip._id, auth);
-        setRuta(rutaTrip.urlRuta);
-        console.log("ruta", rutaTrip.urlRuta);
+        // eslint-disable-next-line no-unused-vars
+      } catch (error) {
+        setError(
+          "No hay viajes programados como conductor para dentro de una hora o menos",
+        );
       } finally {
         setLoading(false);
       }
@@ -64,111 +70,144 @@ export default function StartTrip() {
     );
   }
 
-  if (!trip) {
-    return (
-      <View style={styles.container}>
-        <Text>No hay viajes programados para hoy.</Text>
-      </View>
-    );
-  }
-
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Iniciar Viaje</Text>
-        <View style={styles.tripContainer}>
-          <View style={styles.tripHeader}>
-            <Text style={styles.dateText}>
-              Fecha: {format(new Date(trip.dateStart), "yyyy/MM/dd")}
-            </Text>
-          </View>
-
-          <View style={styles.locations}>
-            <Text style={styles.locationText}>
-              Hora inicio:
-              {format(new Date(trip.dateStart), "HH:mm a", { locale: es })}
-            </Text>
-            <Text style={styles.sectionTitle}>Ruta para buscar pasajeros:</Text>
-            <Text style={styles.locationText}>
-              Lugar: {trip.placeStart.street} {trip.placeStart.number},
-              {trip.placeStart.city}
-            </Text>
-            <Text style={styles.locationText}>
-              Hora:{" "}
-              {format(new Date(trip.dateStart), "HH:mm a", { locale: es })}
-            </Text>
-
-            {reserves.length > 0 && (
-              <>
-                <Text style={styles.sectionTitle}>Puntos de recogida:</Text>
-                {reserves.map((reserve, index) => (
-                  <Text key={reserve._id} style={styles.locationText}>
-                    {index + 1}. {reserve.placeStart.street}
-                    {reserve.placeStart.number},{reserve.placeStart.city}
-                  </Text>
-                ))}
-              </>
-            )}
-          </View>
-
-          <View style={styles.locations}>
-            <Text style={styles.sectionTitle}>Ruta para dejar pasajeros:</Text>
-            <Text style={styles.locationText}>
-              Lugar: {trip.placeEnd.street} {trip.placeEnd.number},
-              {trip.placeEnd.city}
-            </Text>
-            <Text style={styles.locationText}>
-              Hora:{" "}
-              {format(new Date(trip.dateStart), "HH:mm a", { locale: es })}
-            </Text>
-            {reserves.length > 0 && (
-              <>
-                <Text style={styles.sectionTitle}>Puntos de destino:</Text>
-                {reserves.map((reserve, index) => (
-                  <Text key={reserve._id} style={styles.locationText}>
-                    {index + 1}. {reserve.placeEnd.street}
-                    {reserve.placeEnd.number},{reserve.placeEnd.city}
-                  </Text>
-                ))}
-              </>
-            )}
-          </View>
-
-          <Text style={[styles.locationText, { marginTop: 10 }]}>
-            Cada pasajero debe pagarte: $ {trip.tripCost}
+    <View style={styles.container}>
+      <Text style={styles.title}>Próximo Viaje</Text>
+      <View style={styles.infoContainer}>
+        <View style={styles.dateRow}>
+          <Text style={styles.label}>Fecha:</Text>
+          <Text style={styles.value}>
+            {format(new Date(trip.dateStart), "yyyy/MM/dd")}
           </Text>
-
-          <Link href={ruta} style={[styles.chatButton, { marginTop: 10 }]}>
-            <Text style={styles.buttonText}>Ruta por Google Maps</Text>
-          </Link>
-
-          <TouchableOpacity
-            style={[styles.chatButton, { marginTop: 10 }]}
-            onPress={() => router.push(`/home/chat/${trip._id}`)}
-          >
-            <Text style={styles.buttonText}>Acceder al chat</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.deleteButton, { marginTop: 10 }]}
-            onPress={() => {
-              router.push("/home/delete-trip/" + trip._id);
-            }}
-          >
-            <Text style={styles.buttonText}>Terminar Viaje</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.deleteButton,
-              { marginTop: 10, backgroundColor: "#FF6B6B" },
-            ]}
-            onPress={() => router.push(`/home/delete-trip/${trip._id}`)}
-          >
-            <Text style={styles.buttonText}>Cancelar Viaje</Text>
-          </TouchableOpacity>
         </View>
+
+        <View style={styles.timeRow}>
+          <Text style={styles.label}>Hora inicio:</Text>
+          <Text style={styles.value}>
+            {format(new Date(trip.dateStart), "HH:mm a", { locale: es })}
+          </Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Ruta del viaje:</Text>
+        <View style={styles.locationRow}>
+          <Text style={styles.label}>Origen:</Text>
+          <Text style={styles.value}>
+            {trip.placeStart?.name ||
+              trip.placeStart?.street +
+                " " +
+                trip.placeStart?.number +
+                " " +
+                trip.placeStart?.city +
+                " " +
+                trip.placeStart?.province}
+          </Text>
+        </View>
+
+        <View style={styles.locationRow}>
+          <Text style={styles.label}>Destino:</Text>
+          <Text style={styles.value}>
+            {trip.placeEnd?.name ||
+              trip.placeEnd?.street +
+                " " +
+                trip.placeEnd?.number +
+                " " +
+                trip.placeEnd?.city +
+                " " +
+                trip.placeEnd?.province}
+          </Text>
+        </View>
+
+        <Text style={styles.sectionTitle}> Cada pasajero debe pagarte: </Text>
+        <Text style={styles.costValue}>$ {trip.tripCost || "-"}</Text>
       </View>
-    </ScrollView>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Iniciar viaje"
+          onPress={() => {
+            router.push(`/home/start-trip/start-route`);
+          }}
+        />
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  infoContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dateRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  timeRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  locationRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginRight: 10,
+    minWidth: 100,
+  },
+  value: {
+    fontSize: 16,
+    flex: 1,
+  },
+  costValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#007AFF",
+  },
+  buttonContainer: {
+    gap: 10,
+  },
+  info: {
+    marginTop: 10,
+    fontSize: 13,
+    color: "#333",
+  },
+  pressable: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  textPressable: {
+    color: "white",
+    textAlign: "center",
+  },
+});

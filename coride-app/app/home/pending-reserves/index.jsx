@@ -33,7 +33,6 @@ export default function PendingReserves() {
         },
       })
       .then((response) => {
-        //console.log("reserves", response.data);
         setReserves(response.data);
       })
       .catch((error) => {

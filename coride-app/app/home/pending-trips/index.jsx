@@ -22,7 +22,13 @@ export default function PendingTrips() {
         },
       })
       .then((response) => {
-        setTrips(response.data);
+        const allTrips = response.data;
+
+        const pendingTrips = allTrips.filter(
+          (trip) => trip.status === "pendiente",
+        );
+
+        setTrips(pendingTrips);
       })
       .catch((error) => {
         console.log("error", error);
