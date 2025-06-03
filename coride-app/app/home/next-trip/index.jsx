@@ -15,6 +15,8 @@ import { es } from "date-fns/locale";
 import getNextTrip from "../../../utils/getNextTrip";
 import getNextReserve from "../../../utils/getNextReserve";
 import getUrlTrip from "../../../utils/getUrlTrip.js";
+import getTrips from "../../../utils/getTrips.js";
+import getTripCost from "../../../utils/getTripCost.js";
 
 export default function NextTrip() {
   const [loading, setLoading] = useState(true);
@@ -25,35 +27,45 @@ export default function NextTrip() {
   const router = useRouter();
   const { auth } = useAuth();
   const [ruta, setRuta] = useState("");
+  const [tripCost, setTripCost] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      setError("");
       const token = auth;
+
       try {
-        const nextTrip = await getNextTrip(token);
-        console.log("nextTrip", nextTrip);
+        const getCantTrips = await getTrips(token);
 
-        if (nextTrip) {
+        if (getCantTrips.length > 0) {
           setIsDriver(true);
-          setTrip(nextTrip);
 
-          const rutaTrip = await getUrlTrip(nextTrip._id, token);
+          const nextTrip = await getNextTrip(token);
 
-          setRuta(rutaTrip.urlRuta);
-          console.log("ruta", rutaTrip.urlRuta);
+          if (nextTrip) {
+            setTrip(nextTrip);
+            const rutaTrip = await getUrlTrip(nextTrip._id, token);
+            setRuta(rutaTrip.urlRuta);
+            setTripCost(nextTrip.tripCost);
+          } else {
+            setError("No hay viajes próximos.");
+          }
         } else {
           const nextReserve = await getNextReserve(token);
-          console.log("nextReserve", nextReserve);
+
+          const nextTripId = nextReserve.trip;
+          console.log("nextTripId", nextTripId);
+
           if (nextReserve) {
             setReserve(nextReserve);
+            const tripCost = await getTripCost(token, nextTripId);
+            setTripCost(tripCost);
           } else {
             setError("No hay reservas próximas.");
           }
         }
-        // eslint-disable-next-line no-unused-vars
       } catch (error) {
-        setError("Error al cargar los datos");
+        console.error("Error al obtener array de viajes", error);
+        setError("Error al obtener los viajes");
       } finally {
         setLoading(false);
       }
@@ -78,7 +90,7 @@ export default function NextTrip() {
     );
   }
 
-  if (!trip) {
+  if (!trip && !reserve) {
     return (
       <View style={styles.container}>
         <Text>No hay viajes o reservas próximos.</Text>
@@ -90,7 +102,9 @@ export default function NextTrip() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Próximo Viaje</Text>
+      <Text style={styles.title}>
+        {isDriver ? "Próximo Viaje" : "Próxima Reserva"}
+      </Text>
       <View style={styles.infoContainer}>
         <View style={styles.dateRow}>
           <Text style={styles.label}>Fecha:</Text>
@@ -110,19 +124,35 @@ export default function NextTrip() {
         <View style={styles.locationRow}>
           <Text style={styles.label}>Origen:</Text>
           <Text style={styles.value}>
-            {displayData.placeStart?.name || "-"}
+            {displayData.placeStart?.name ||
+              displayData.placeStart?.street +
+                " " +
+                displayData.placeStart?.number +
+                " " +
+                displayData.placeStart?.city +
+                " " +
+                displayData.placeStart?.province}
           </Text>
         </View>
 
         <View style={styles.locationRow}>
           <Text style={styles.label}>Destino:</Text>
-          <Text style={styles.value}>{displayData.placeEnd?.name || "-"}</Text>
+          <Text style={styles.value}>
+            {displayData.placeEnd?.name ||
+              displayData.placeEnd?.street +
+                " " +
+                displayData.placeEnd?.number +
+                " " +
+                displayData.placeEnd?.city +
+                " " +
+                displayData.placeEnd?.province}
+          </Text>
         </View>
 
         <Text style={styles.sectionTitle}>
           {isDriver ? "Cada pasajero debe pagarte:" : "Deberás pagar:"}
         </Text>
-        <Text style={styles.costValue}>$ {displayData.tripCost || "-"}</Text>
+        <Text style={styles.costValue}>$ {tripCost || "-"}</Text>
 
         {!isDriver && (
           <Text style={styles.info}>
@@ -145,14 +175,16 @@ export default function NextTrip() {
         <Button
           title="Acceder al chat"
           onPress={() => {
-            router.push(`/home/chat/${trip._id}`);
+            const tripId = isDriver ? trip.id : reserve.trip;
+            router.push(`/home/chat/${tripId}`);
           }}
         />
         <Button
           title="Eliminar viaje"
           color="#FF3B30"
           onPress={() => {
-            router.push(`/home/delete-trip/${trip._id}`);
+            const tripId = isDriver ? trip.id : reserve.trip;
+            router.push(`/home/delete-trip/${tripId}`);
           }}
         />
         <Button

@@ -93,14 +93,14 @@ export default function SelectStartPlace() {
       place.street === "" ||
       place.number === ""
     ) {
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   const handleContinuar = () => {
-    if (isPlaceEmpty) {
+    if (isPlaceEmpty()) {
       console.log("lugar ya registrado elegido");
       console.log("selectedRegularPlace", selectedRegularPlace);
 

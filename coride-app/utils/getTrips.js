@@ -1,9 +1,9 @@
 import getUrl from "./url";
 import axios from "axios";
 
-export default async function getNextTrip(token) {
+export default async function getTrips(token) {
   try {
-    const url = getUrl() + "/api/trips/next-trip";
+    const url = getUrl() + "/api/trips";
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -11,7 +11,7 @@ export default async function getNextTrip(token) {
     });
     return response.data;
   } catch (error) {
-    console.log("Error al obtener el siguiente viaje:", error);
+    console.error("Error al obtener los viajes:", error);
     return null;
   }
 }

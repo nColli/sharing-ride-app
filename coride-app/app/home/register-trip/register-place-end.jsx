@@ -87,15 +87,20 @@ export default function SelectStartPlace() {
   };
 
   function isPlaceEmpty() {
-    if (place.city === "" || place.province === "" || place.street === "" || place.number === "") {
-      return false;
+    if (
+      place.city === "" ||
+      place.province === "" ||
+      place.street === "" ||
+      place.number === ""
+    ) {
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   const handleContinuar = () => {
-    if (isPlaceEmpty) {
+    if (isPlaceEmpty()) {
       console.log("lugar ya registrado elegido");
       console.log("selectedRegularPlace", selectedRegularPlace);
 
@@ -107,7 +112,6 @@ export default function SelectStartPlace() {
       console.log("new trip en seleccionar lugar de llegada", newTrip);
 
       setTrip(newTrip);
-
     } else {
       console.log("lugar nuevo elegido", place);
 
@@ -129,7 +133,7 @@ export default function SelectStartPlace() {
       <View style={styles.container}>
         <Text style={styles.title}>Registra tu recorrido</Text>
         <Text style={styles.subtitle}>
-          Elegi un punto de partida habitual o agrega uno nuevo
+          Elegi un punto de destino habitual o agrega uno nuevo
         </Text>
         <View style={styles.pickerContainer}>
           <Picker

@@ -63,7 +63,7 @@ const ContainerTrip = ({ reserve }) => {
   const router = useRouter();
 
   const handleChatAccess = () => {
-    router.push("/home/chat/" + reserve._id);
+    router.push("/home/chat/" + reserve.trip);
   };
 
   const handleDeleteReserve = () => {
