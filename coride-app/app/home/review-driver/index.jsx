@@ -6,41 +6,23 @@ import {
   Button,
   TextInput,
 } from "react-native";
-import { useState } from "react";
-import { useTrip } from "./TripContext";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../AuthContext";
 import { useRouter } from "expo-router";
 import getUrl from "../../../utils/url";
 import axios from "axios";
+import getPendingReview from "../../../utils/getPendingReview";
 
-const InputOpinion = ({ handleOpinion, user }) => {
-  console.log("user", user);
-
-  const { trip } = useTrip();
-
+const InputOpinion = ({ handleOpinion, driver, reserve }) => {
   const textPlace = (place) => {
     return `${place.street} ${place.number}, ${place.city}`;
   };
 
   const routeUser = () => {
-    const reserveUser = trip.bookings.find((reserve) => {
-      console.log("--------------------------------");
-      console.log("reserve", reserve);
-      console.log("user", user);
-      console.log("reserve.user", reserve.user);
-      console.log("user._id", user._id);
-      console.log("--------------------------------");
-      return reserve.user === user._id;
-    });
-    console.log("reserveUser", reserveUser);
     return (
       <View>
-        <Text style={styles.label}>
-          Desde: {textPlace(reserveUser.placeStart)}
-        </Text>
-        <Text style={styles.label}>
-          Hasta: {textPlace(reserveUser.placeEnd)}
-        </Text>
+        <Text style={styles.label}>Desde: {textPlace(reserve.placeStart)}</Text>
+        <Text style={styles.label}>Hasta: {textPlace(reserve.placeEnd)}</Text>
       </View>
     );
   };
@@ -48,9 +30,19 @@ const InputOpinion = ({ handleOpinion, user }) => {
   return (
     <View style={styles.infoContainer}>
       <Text style={styles.sectionTitle}>
-        Opinión de {user.name} {user.surname}
+        Opinión de {driver.name} {driver.surname}
       </Text>
       {routeUser()}
+      <Text style={styles.label}>
+        Fecha:{" "}
+        {new Date(reserve.dateStart).toLocaleString("es-AR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </Text>
 
       <TextInput
         style={styles.input}
@@ -63,45 +55,52 @@ const InputOpinion = ({ handleOpinion, user }) => {
 };
 
 export default function NextTrip() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { trip } = useTrip();
   const { auth } = useAuth();
   const router = useRouter();
-  const [opinions, setOpinions] = useState([]);
+  const [opinion, setOpinion] = useState("");
+  const [driver, setDriver] = useState(null);
+  const [reserve, setReserve] = useState(null);
 
-  const handleOpinion = (opinion, userTo) => {
-    console.log(opinion, userTo);
-
-    const prevOpinions = opinions;
-
-    let opinionExists = false;
-    prevOpinions.map((opinionSaved) => {
-      if (opinionSaved.userTo === userTo) {
-        opinionSaved.opinion = opinion;
-        opinionExists = true;
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = auth;
+      const { reserve, driver } = await getPendingReview(token);
+      console.log("reserve", reserve);
+      console.log("driver", driver);
+      if (reserve && driver) {
+        setDriver(driver);
+        setReserve(reserve);
+      } else {
+        setError("No hay una revisión pendiente");
       }
-    });
+      setLoading(false);
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    if (!opinionExists) {
-      prevOpinions.push({ userTo, opinion });
-    }
-
-    setOpinions(prevOpinions);
+  const handleOpinion = (newOpinion) => {
+    setOpinion(newOpinion);
   };
 
-  const handleFinalizarViaje = async () => {
+  const handleReviewDriver = async () => {
     setLoading(true);
 
     //enviar opiniones al servidor, para que marque el viaje como finalzado
     try {
-      const body = {
-        opinions,
+      const opinionToSend = {
+        userTo: driver.id,
+        opinion: opinion,
       };
 
-      const url = getUrl() + "/api/trips/finish/" + trip._id;
+      const url = getUrl() + "/api/trips/review-driver/" + reserve.trip._id; //reserve.trip es el ID del viaje
 
-      const response = await axios.put(url, body, {
+      console.log("opinionToSend", opinionToSend);
+      console.log("url", url);
+
+      const response = await axios.put(url, opinionToSend, {
         headers: {
           Authorization: `Bearer ${auth}`,
         },
@@ -111,8 +110,8 @@ export default function NextTrip() {
 
       router.push("/home");
     } catch (error) {
-      console.log("Error al finalizar el viaje:", error);
-      setError("Error al finalizar el viaje");
+      console.log("Error al evaluar el conductor:", error);
+      setError("Error al evaluar el conductor");
     } finally {
       setLoading(false);
     }
@@ -137,29 +136,15 @@ export default function NextTrip() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Próximo Viaje</Text>
-      {trip.usersTo.map((user) => {
-        console.log("user", user);
-        return (
-          <InputOpinion
-            key={user._id}
-            user={user}
-            handleOpinion={(opinion) => handleOpinion(opinion, user._id)}
-          />
-        );
-      })}
-
-      <Text style={styles.sectionTitle}>Datos de la transferencia</Text>
-      <Text style={styles.info}>
-        Para abonar la comisión del viaje, transfiera el monto al siguiente
-        alias con el motivo indicado en la transferencia
-      </Text>
-      <Text style={styles.info}>Alias Transferencia: {trip.alias}</Text>
-      <Text style={styles.info}>Monto: {trip.tripFee}</Text>
-      <Text style={styles.info}>Motivo (DNI suyo): {trip.motivo}</Text>
+      <Text style={styles.title}>Evaluar conductor</Text>
+      <InputOpinion
+        driver={driver}
+        reserve={reserve}
+        handleOpinion={handleOpinion}
+      />
 
       <View style={styles.buttonContainer}>
-        <Button title="Finalizar viaje" onPress={handleFinalizarViaje} />
+        <Button title="Evaluar conductor" onPress={handleReviewDriver} />
       </View>
     </View>
   );
@@ -214,6 +199,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginRight: 10,
     minWidth: 100,
+    marginBottom: 10,
   },
   value: {
     fontSize: 16,

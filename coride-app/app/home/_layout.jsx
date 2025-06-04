@@ -34,6 +34,10 @@ export default function RootLayout() {
         options={{ title: "Gestion de usuario" }}
       />
       <Stack.Screen name="start-trip" options={{ title: "Iniciar viaje" }} />
+      <Stack.Screen
+        name="review-driver"
+        options={{ title: "Evaluar conductor" }}
+      />
     </Stack>
   );
 }

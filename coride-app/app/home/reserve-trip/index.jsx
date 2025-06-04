@@ -43,7 +43,7 @@ export default function SelectPlaceStart() {
       .then((response) => {
         const regularPlaces = response.data;
         setRegularPlaces(regularPlaces);
-        //setSelectedRegularPlace(regularPlaces[0]);
+        setSelectedRegularPlace(regularPlaces[0]);
       })
       .catch((error) => {
         console.log("error al obtener lugares", error);

@@ -175,7 +175,7 @@ export default function NextTrip() {
         <Button
           title="Acceder al chat"
           onPress={() => {
-            const tripId = isDriver ? trip.id : reserve.trip;
+            const tripId = isDriver ? trip._id : reserve.trip;
             router.push(`/home/chat/${tripId}`);
           }}
         />
@@ -183,7 +183,7 @@ export default function NextTrip() {
           title="Eliminar viaje"
           color="#FF3B30"
           onPress={() => {
-            const tripId = isDriver ? trip.id : reserve.trip;
+            const tripId = isDriver ? trip._id : reserve.trip;
             router.push(`/home/delete-trip/${tripId}`);
           }}
         />

@@ -8,6 +8,9 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useAuth } from "../AuthContext";
+import { useState, useEffect } from "react";
+import getHasPendingReviews from "../../utils/getHasPendingReviews";
 
 const functionalButtons = [
   {
@@ -62,6 +65,19 @@ const functionalButtons = [
 
 const HomeScreen = () => {
   const router = useRouter();
+  const { auth } = useAuth();
+  const [hasPendingReviews, setHasPendingReviews] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = auth;
+      const pendingReviews = await getHasPendingReviews(token);
+      console.log("pendingReviews", pendingReviews);
+      setHasPendingReviews(pendingReviews);
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleProfilePress = () => {
     router.push("/home/user-management");
@@ -97,6 +113,16 @@ const HomeScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.functionContainer}>
+        {hasPendingReviews && (
+          <TouchableOpacity
+            style={styles.functionButton}
+            onPress={() => handleFunctionPress("home/review-driver")}
+          >
+            <Text style={styles.functionIcon}>★★★</Text>
+            <Text style={styles.functionTitle}> Evaluar Conductor </Text>
+          </TouchableOpacity>
+        )}
+
         {functionalButtons.map((button) => (
           <TouchableOpacity
             key={button.id}
