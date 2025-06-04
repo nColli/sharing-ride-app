@@ -1,5 +1,5 @@
 import { View, Text, Button, Alert } from "react-native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { styles } from "../../../utils/styles";
 import deleteReserve from "../../../utils/deleteReserve";
 import { useAuth } from "../../AuthContext";
@@ -13,15 +13,30 @@ export default function ConfirmReserve() {
   const { auth } = useAuth();
   const { reserve, setReserve } = useReserve();
   const router = useRouter();
+  const [tripCost, setTripCost] = useState("0");
 
   useEffect(() => {
     //obt reserva con datos de trips y trip completos para informar costo
     (async function () {
-      console.log("reserve._id", reserve._id);
-      const completeReserve = await getReserve(reserve._id, auth);
-      console.log("completeReserve", completeReserve);
-      setReserve(completeReserve);
+      //verificar si es una rutina - si es, es un array de reservas, tomo la primera, sino es una reserva normal
+      console.log("reserve en CONFIRMAR RESERVA", reserve);
+      if (reserve?.savedReserves) {
+        const completeReserve = await getReserve(
+          reserve.savedReserves[0]._id,
+          auth,
+        );
+        console.log("completeReserve", completeReserve);
+        setReserve(completeReserve);
+        setTripCost(completeReserve.trip.tripCost);
+        return;
+      } else {
+        const completeReserve = await getReserve(reserve._id, auth);
+        console.log("completeReserve", completeReserve);
+        setReserve(completeReserve);
+        setTripCost(completeReserve.trip.tripCost);
+      }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const eliminarReservaPendiente = async () => {
@@ -73,7 +88,7 @@ export default function ConfirmReserve() {
         tenés un chat para hablar con el.
       </Text>
       <Text>Costo del viaje</Text>
-      <Text>{reserve.trip.tripCost ? reserve.trip.tripCost : "0"}</Text>
+      <Text>{tripCost}</Text>
       <Button title="Confirmar reserva" onPress={confirmarReserva} />
       <Button title="Eliminar reserva" onPress={eliminarReservaPendiente} />
     </View>

@@ -14,7 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { router } from "expo-router";
-
+import getUrl from "../../../utils/url";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import useLoading from "../../../custom_hooks/useLoading";
 import { useAuth } from "../../AuthContext";
@@ -143,16 +143,12 @@ export default function VehicleRegistration() {
 
     try {
       await withLoading(
-        axios.post(
-          "https://backend-sharing-ride-app.onrender.com/api/vehicles",
-          data,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
+        axios.post(`${getUrl()}/api/vehicles`, data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
-        ),
+        }),
       );
       Alert.alert("Vehiculo registrado", "Vehículo registrado correctamente");
 

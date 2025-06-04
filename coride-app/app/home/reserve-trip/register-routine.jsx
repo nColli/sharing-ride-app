@@ -75,6 +75,10 @@ export default function RegisterRoutine() {
     });
   };
 
+  const isEmptyObject = (obj) => {
+    return Object.keys(obj).length === 0;
+  };
+
   const handleRegistrarDistancia = async () => {
     if (days.length === 0) {
       Alert.alert("Error", "Seleccione los días para registrar la rutina");
@@ -102,7 +106,23 @@ export default function RegisterRoutine() {
 
     const newReserveServer = await createReserve(newReserve, auth);
 
-    if (newReserveServer === null) {
+    console.log("new reserve server", newReserveServer);
+
+    if (newReserveServer?.savedReserves) {
+      const { savedReserves } = newReserveServer;
+      setReserve(savedReserves);
+      console.log("Saved reserves array:", savedReserves);
+
+      router.navigate("home/reserve-trip/confirm-reserve");
+    } else {
+      console.log("No savedReserves found in response");
+    }
+
+    if (
+      newReserveServer === null ||
+      newReserveServer === undefined ||
+      isEmptyObject(newReserveServer)
+    ) {
       Alert.alert("Error", "No se ha podido crear la rutina", [
         {
           texto: "Ok",

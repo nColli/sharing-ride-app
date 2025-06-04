@@ -4,7 +4,7 @@ import { View, Text, TextInput, Button, Alert } from "react-native";
 import axios, { AxiosResponse } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "../../utils/styles";
-
+import getUrl from "../../utils/url";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import useLoading from "../../custom_hooks/useLoading";
 import { useAuth } from "../AuthContext";
@@ -46,8 +46,7 @@ export default function Entercode() {
       email,
     };
 
-    const URL =
-      "https://backend-sharing-ride-app.onrender.com/api/resetpassword/";
+    const URL = `${getUrl()}/api/resetpassword/`;
     const URL_TOKEN = URL.concat(token);
 
     console.log("url", URL_TOKEN);

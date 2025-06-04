@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import useLoading from "../../custom_hooks/useLoading";
 import { validateEmailAndGetError } from "../../utils/validateEmail";
+import getUrl from "../../utils/url";
 
 export default function Resetpassword() {
   const { isLoading, withLoading } = useLoading();
@@ -45,8 +46,7 @@ export default function Resetpassword() {
 
     const body = { email };
 
-    const url =
-      "https://backend-sharing-ride-app.onrender.com/api/resetpassword";
+    const url = `${getUrl()}/api/resetpassword`;
 
     try {
       //const response = await axios.post(url, body)

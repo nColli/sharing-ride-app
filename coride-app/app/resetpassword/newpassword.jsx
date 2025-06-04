@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "../../utils/styles";
-
+import getUrl from "../../utils/url";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import useLoading from "../../custom_hooks/useLoading";
 
@@ -32,8 +32,7 @@ export default function Newpassword() {
       password,
     };
 
-    const URL =
-      "https://backend-sharing-ride-app.onrender.com/api/user/changepassword";
+    const URL = `${getUrl()}/api/user/changepassword`;
 
     const token = await AsyncStorage.getItem("authToken");
 
