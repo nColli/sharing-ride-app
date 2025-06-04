@@ -12,6 +12,7 @@ import getReserve from "../../../utils/getReserve";
 export default function ConfirmReserve() {
   const { auth } = useAuth();
   const { reserve, setReserve } = useReserve();
+  const [reserves, setReserves] = useState([]);
   const router = useRouter();
   const [tripCost, setTripCost] = useState("0");
 
@@ -26,13 +27,16 @@ export default function ConfirmReserve() {
           auth,
         );
         console.log("completeReserve", completeReserve);
-        setReserve(completeReserve);
+        //setReserve(completeReserve);
+        console.log("reserve.savedReserves", reserve.savedReserves);
+        setReserves(reserve.savedReserves);
         setTripCost(completeReserve.trip.tripCost);
         return;
       } else {
         const completeReserve = await getReserve(reserve._id, auth);
         console.log("completeReserve", completeReserve);
-        setReserve(completeReserve);
+        setReserves(reserves.concat(reserve));
+        //setReserve(completeReserve);
         setTripCost(completeReserve.trip.tripCost);
       }
     })();
@@ -40,7 +44,10 @@ export default function ConfirmReserve() {
   }, []);
 
   const eliminarReservaPendiente = async () => {
-    await deleteReserve(reserve._id, auth);
+    //eliminar array de reservas, si es una sola es una iteracion
+    reserves.map(async (reserve) => {
+      await deleteReserve(reserve._id, auth);
+    });
 
     Alert.alert("Reserva cancelada", "La reserva ha sido cancelada", [
       {
@@ -57,7 +64,7 @@ export default function ConfirmReserve() {
     const urlConfirmacion = url + "/api/reserves/confirm";
     console.log("url para confirmar reserva", urlConfirmacion);
 
-    const reserves = [reserve];
+    //const reserves = [reserve];
 
     axios
       .patch(urlConfirmacion, reserves, {
