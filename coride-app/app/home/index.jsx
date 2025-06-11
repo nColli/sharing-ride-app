@@ -61,6 +61,12 @@ const functionalButtons = [
     icon: "🚀",
     route: "home/start-trip",
   },
+  {
+    id: "9",
+    title: "Ver estadísticas",
+    icon: "📊",
+    route: "home/watch-statistics",
+  },
 ];
 
 const HomeScreen = () => {

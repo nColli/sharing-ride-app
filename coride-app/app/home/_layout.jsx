@@ -38,6 +38,10 @@ export default function RootLayout() {
         name="review-driver"
         options={{ title: "Evaluar conductor" }}
       />
+      <Stack.Screen
+        name="watch-statistics"
+        options={{ title: "Ver estadísticas" }}
+      />
     </Stack>
   );
 }

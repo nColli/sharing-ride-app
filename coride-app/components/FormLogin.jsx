@@ -34,7 +34,7 @@ export default function FormLogin() {
   };
 
   const navigateToHome = () => {
-    router.navigate("home");
+    router.push("home");
   };
 
   function saveAuthToken(response) {
