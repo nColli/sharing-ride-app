@@ -96,8 +96,10 @@ export default function ConfirmReserve() {
       </Text>
       <Text>Costo del viaje</Text>
       <Text>{tripCost}</Text>
-      <Button title="Confirmar reserva" onPress={confirmarReserva} />
-      <Button title="Eliminar reserva" onPress={eliminarReservaPendiente} />
+      <View style={styles.buttonContainer}>
+        <Button title="Confirmar reserva" onPress={confirmarReserva} />
+        <Button title="Eliminar reserva" onPress={eliminarReservaPendiente} />
+      </View>
     </View>
   );
 }

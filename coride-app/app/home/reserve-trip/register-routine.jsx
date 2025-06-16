@@ -149,7 +149,7 @@ export default function RegisterRoutine() {
         />
         <DateTimePickerModal
           isVisible={showDatePickerStart}
-          time={dateStart}
+          date={dateStart}
           mode="date"
           onConfirm={onChangeDateStart}
           onCancel={() => setShowDatePickerStart(false)}
@@ -163,7 +163,7 @@ export default function RegisterRoutine() {
         />
         <DateTimePickerModal
           isVisible={showDatePickerEnd}
-          time={dateEnd}
+          date={dateEnd}
           mode="date"
           onConfirm={onChangeDateEnd}
           onCancel={() => setShowDatePickerEnd(false)}
@@ -177,7 +177,7 @@ export default function RegisterRoutine() {
         />
         <DateTimePickerModal
           isVisible={showTimePicker}
-          time={timeStart}
+          date={timeStart}
           mode="time"
           onConfirm={onChangeTime}
           onCancel={() => setShowTimePicker(false)}

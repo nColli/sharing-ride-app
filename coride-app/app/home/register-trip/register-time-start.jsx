@@ -1,7 +1,7 @@
 import { styles } from "../../../utils/styles";
 import { useTrip } from "./TripContext";
 import { View, Text, Button, Appearance } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useRouter } from "expo-router";
 
@@ -12,6 +12,18 @@ export default function SelectTimeStart() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const router = useRouter();
   const { trip, setTrip } = useTrip();
+
+  // Initialize dates from trip context if available and valid
+  useEffect(() => {
+    if (
+      trip?.date &&
+      trip.date instanceof Date &&
+      !isNaN(trip.date.getTime())
+    ) {
+      setDateStart(trip.date);
+      setTimeStart(trip.date);
+    }
+  }, [trip]);
 
   const onChangeTime = (event) => {
     setShowTimePicker(false);
@@ -54,7 +66,7 @@ export default function SelectTimeStart() {
     console.log("fecha y hora elegida", timeStart, dateStart);
 
     //poner en dateStart las horas y minutos elegidos en timeStart
-    const newDateStart = dateStart; //como es un hook creo una copia
+    const newDateStart = new Date(dateStart); //create a proper copy
 
     newDateStart.setHours(timeStart.getHours());
     newDateStart.setMinutes(timeStart.getMinutes());
@@ -81,7 +93,7 @@ export default function SelectTimeStart() {
       />
       <DateTimePickerModal
         isVisible={showTimePicker}
-        time={timeStart}
+        date={timeStart}
         mode="time"
         onConfirm={onChangeTime}
         onCancel={() => setShowTimePicker(false)}
@@ -94,7 +106,7 @@ export default function SelectTimeStart() {
       />
       <DateTimePickerModal
         isVisible={showDatePicker}
-        time={dateStart}
+        date={dateStart}
         mode="date"
         onConfirm={onChangeDate}
         onCancel={() => setShowDatePicker(false)}

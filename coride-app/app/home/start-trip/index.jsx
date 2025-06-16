@@ -119,6 +119,10 @@ export default function NextTrip() {
 
         <Text style={styles.sectionTitle}> Cada pasajero debe pagarte: </Text>
         <Text style={styles.costValue}>$ {trip.tripCost || "-"}</Text>
+
+        <Text style={styles.sectionTitle}>
+          Pasajeros a recoger: {trip.bookings?.length || 0}
+        </Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -209,5 +213,11 @@ const styles = StyleSheet.create({
   textPressable: {
     color: "white",
     textAlign: "center",
+  },
+  passengerCount: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginTop: 10,
+    marginBottom: 10,
   },
 });

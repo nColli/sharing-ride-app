@@ -33,7 +33,11 @@ export default function PendingReserves() {
         },
       })
       .then((response) => {
-        setReserves(response.data);
+        //setReserves(response.data);
+        const sortedReserves = response.data.sort(
+          (a, b) => new Date(a.dateStart) - new Date(b.dateStart),
+        );
+        setReserves(sortedReserves);
       })
       .catch((error) => {
         console.log("error", error);

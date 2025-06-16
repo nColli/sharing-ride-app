@@ -18,6 +18,9 @@ export default function SelectVehicle() {
 
   useFocusEffect(
     useCallback(() => {
+      // Clear trip state when entering the registration flow
+      setTrip(null);
+
       const url = getURL() + "/api/vehicles"; //obt vehiculos del usuario
 
       const token = auth;

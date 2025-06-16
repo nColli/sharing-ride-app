@@ -154,6 +154,12 @@ export default function NextTrip() {
         </Text>
         <Text style={styles.costValue}>$ {tripCost || "-"}</Text>
 
+        {isDriver && (
+          <Text style={styles.sectionTitle}>
+            Pasajeros confirmados: {trip.bookings?.length || 0}
+          </Text>
+        )}
+
         {!isDriver && (
           <Text style={styles.info}>
             El pago lo arreglás con el conductor por el chat o al momento de
@@ -274,5 +280,10 @@ const styles = StyleSheet.create({
   textPressable: {
     color: "white",
     textAlign: "center",
+  },
+  passengerCount: {
+    marginTop: 2,
+    fontSize: 13,
+    color: "#333",
   },
 });

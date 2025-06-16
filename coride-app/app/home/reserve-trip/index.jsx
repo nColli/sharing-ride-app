@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { View, Text, Button, Alert, ScrollView, TextInput } from "react-native";
 import { styles } from "../../../utils/styles";
 import { useReserve } from "./ReserveContext";
@@ -8,6 +8,7 @@ import getURL from "../../../utils/url";
 import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
 import { PROVINCES } from "../../../utils/provinces";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function SelectPlaceStart() {
   const defaultPlace = {
@@ -28,6 +29,13 @@ export default function SelectPlaceStart() {
 
   const [regularPlaces, setRegularPlaces] = useState([]);
   //const [selectedRegularPlace, setSelectedRegularPlace] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Clear reserve state when entering the reservation flow
+      setReserve(null);
+    }, [setReserve]),
+  );
 
   useEffect(() => {
     const url = getURL() + "/api/places";

@@ -1,7 +1,7 @@
 import { styles } from "../../../utils/styles";
 import { useReserve } from "./ReserveContext";
 import { View, Text, Button, Appearance, Alert } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useRouter } from "expo-router";
 import { createReserve } from "../../../utils/createReserve";
@@ -15,6 +15,18 @@ export default function SelectTimeStart() {
   const router = useRouter();
   const { reserve, setReserve } = useReserve();
   const { auth } = useAuth();
+
+  // Initialize dates from reserve context if available and valid
+  useEffect(() => {
+    if (
+      reserve?.date &&
+      reserve.date instanceof Date &&
+      !isNaN(reserve.date.getTime())
+    ) {
+      setDateStart(reserve.date);
+      setTimeStart(reserve.date);
+    }
+  }, [reserve]);
 
   const onChangeTime = (event) => {
     setShowTimePicker(false);
@@ -50,7 +62,7 @@ export default function SelectTimeStart() {
   const handleContinuar = async () => {
     console.log("fecha y hora elegida", timeStart, dateStart);
 
-    const copyDateStart = dateStart;
+    const copyDateStart = new Date(dateStart); // create a proper copy
     copyDateStart.setHours(timeStart.getHours());
     copyDateStart.setMinutes(timeStart.getMinutes());
 
@@ -93,7 +105,7 @@ export default function SelectTimeStart() {
       />
       <DateTimePickerModal
         isVisible={showTimePicker}
-        time={timeStart}
+        date={timeStart}
         mode="time"
         onConfirm={onChangeTime}
         onCancel={() => setShowTimePicker(false)}
@@ -106,7 +118,7 @@ export default function SelectTimeStart() {
       />
       <DateTimePickerModal
         isVisible={showDatePicker}
-        time={dateStart}
+        date={dateStart}
         mode="date"
         onConfirm={onChangeDate}
         onCancel={() => setShowDatePicker(false)}

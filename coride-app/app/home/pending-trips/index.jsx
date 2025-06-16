@@ -28,7 +28,11 @@ export default function PendingTrips() {
           (trip) => trip.status === "pendiente",
         );
 
-        setTrips(pendingTrips);
+        const sortedTrips = pendingTrips.sort(
+          (a, b) => new Date(a.dateStart) - new Date(b.dateStart),
+        );
+
+        setTrips(sortedTrips);
       })
       .catch((error) => {
         console.log("error", error);

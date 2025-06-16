@@ -34,7 +34,7 @@ const InputOpinion = ({ handleOpinion, user }) => {
     });
     console.log("reserveUser", reserveUser);
     return (
-      <View>
+      <View style={styles.routeContainer}>
         <Text style={styles.label}>
           Desde: {textPlace(reserveUser.placeStart)}
         </Text>
@@ -137,7 +137,7 @@ export default function NextTrip() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Próximo Viaje</Text>
+      <Text style={styles.title}>Finalizar viaje</Text>
       {trip.usersTo.map((user) => {
         console.log("user", user);
         return (
@@ -154,9 +154,18 @@ export default function NextTrip() {
         Para abonar la comisión del viaje, transfiera el monto al siguiente
         alias con el motivo indicado en la transferencia
       </Text>
-      <Text style={styles.info}>Alias Transferencia: {trip.alias}</Text>
-      <Text style={styles.info}>Monto: {trip.tripFee}</Text>
-      <Text style={styles.info}>Motivo (DNI suyo): {trip.motivo}</Text>
+      <View style={styles.transferInfo}>
+        <Text style={styles.transferLabel}>Alias Transferencia:</Text>
+        <Text style={styles.transferValue}>{trip.alias}</Text>
+      </View>
+      <View style={styles.transferInfo}>
+        <Text style={styles.transferLabel}>Monto:</Text>
+        <Text style={styles.transferValue}>${trip.tripFee}</Text>
+      </View>
+      <View style={styles.transferInfo}>
+        <Text style={styles.transferLabel}>Motivo (DNI suyo):</Text>
+        <Text style={styles.transferValue}>{trip.motivo}</Text>
+      </View>
 
       <View style={styles.buttonContainer}>
         <Button title="Finalizar viaje" onPress={handleFinalizarViaje} />
@@ -226,6 +235,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     gap: 10,
+    marginTop: 20,
   },
   info: {
     marginTop: 10,
@@ -247,5 +257,21 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
+  },
+  routeContainer: {
+    marginBottom: 10,
+  },
+  transferInfo: {
+    flexDirection: "row",
+    marginBottom: 5,
+  },
+  transferLabel: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginRight: 5,
+  },
+  transferValue: {
+    fontSize: 16,
+    flex: 1,
   },
 });

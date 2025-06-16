@@ -29,14 +29,13 @@ export default function WatchStatistics() {
 
   useEffect(() => {
     const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
+    const today = new Date(now);
 
-    const monthBefore = new Date(yesterday);
-    monthBefore.setMonth(yesterday.getMonth() - 1);
+    const monthBefore = new Date(today);
+    monthBefore.setMonth(today.getMonth() - 1);
 
     setStartDate(monthBefore);
-    setEndDate(yesterday);
+    setEndDate(today);
   }, []);
   useEffect(() => {
     if (auth) {
@@ -193,7 +192,6 @@ export default function WatchStatistics() {
           display="default"
           onChange={onEndDateChange}
           minimumDate={startDate}
-          maximumDate={new Date()}
         />
       )}
 
@@ -409,7 +407,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 2,
   },
