@@ -1,20 +1,21 @@
 import {
   View,
   Text,
-  Button,
   Appearance,
   Alert,
   ScrollView,
+  StyleSheet,
+  Pressable,
 } from "react-native";
 import { useReserve } from "./ReserveContext";
 import { useRouter } from "expo-router";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useState } from "react";
-import { styles } from "../../../utils/styles";
 import { MultiSelect } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { createReserve } from "../../../utils/createReserve";
 import { useAuth } from "../../AuthContext";
+import KeyboardAwareContainer from "../../../components/KeyboardAwareContainer";
 
 const data = [
   { label: "Domingo", value: "Sunday" },
@@ -138,83 +139,214 @@ export default function RegisterRoutine() {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Registrar rutina</Text>
+    <KeyboardAwareContainer>
+      <View style={localStyles.container}>
+        <Text style={localStyles.title}>Registrar rutina</Text>
 
-        <Text style={styles.label}>Fecha de inicio de la rutina</Text>
-        <Button
-          title={formatDate(dateStart)}
-          onPress={() => setShowDatePickerStart(true)}
-        />
-        <DateTimePickerModal
-          isVisible={showDatePickerStart}
-          date={dateStart}
-          mode="date"
-          onConfirm={onChangeDateStart}
-          onCancel={() => setShowDatePickerStart(false)}
-          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-        />
-
-        <Text style={styles.label}>Fecha de fin de la rutina</Text>
-        <Button
-          title={formatDate(dateEnd)}
-          onPress={() => setShowDatePickerEnd(true)}
-        />
-        <DateTimePickerModal
-          isVisible={showDatePickerEnd}
-          date={dateEnd}
-          mode="date"
-          onConfirm={onChangeDateEnd}
-          onCancel={() => setShowDatePickerEnd(false)}
-          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-        />
-
-        <Text style={styles.label}>Selecciona la hora del viaje:</Text>
-        <Button
-          title={formatTime(timeStart)}
-          onPress={() => setShowTimePicker(true)}
-        />
-        <DateTimePickerModal
-          isVisible={showTimePicker}
-          date={timeStart}
-          mode="time"
-          onConfirm={onChangeTime}
-          onCancel={() => setShowTimePicker(false)}
-          isDarkModeEnabled={Appearance.getColorScheme() === "light"}
-        />
-
-        <View style={styles.dropdownContainer}>
+        <View style={localStyles.daysContainer}>
+          <Text style={localStyles.sectionTitle}>Días de la semana</Text>
+          <Text style={localStyles.description}>
+            Selecciona los días en los que quieres que se repita el viaje
+          </Text>
           <MultiSelect
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
+            style={localStyles.dropdown}
+            placeholderStyle={localStyles.placeholderStyle}
+            selectedTextStyle={localStyles.selectedTextStyle}
+            inputSearchStyle={localStyles.inputSearchStyle}
+            iconStyle={localStyles.iconStyle}
             search
             data={data}
             labelField="label"
             valueField="value"
-            placeholder="Select item"
-            searchPlaceholder="Search..."
+            placeholder="Seleccionar días"
+            searchPlaceholder="Buscar..."
             value={days}
             onChange={(item) => {
               setDays(item);
             }}
             renderLeftIcon={() => (
               <AntDesign
-                style={styles.icon}
+                style={localStyles.icon}
                 color="black"
                 name="Safety"
                 size={20}
               />
             )}
-            selectedStyle={styles.selectedStyle}
+            selectedStyle={localStyles.selectedStyle}
           />
         </View>
 
-        <Button title="Continuar" onPress={handleRegistrarDistancia} />
+        <View style={localStyles.infoContainer}>
+          <Text style={localStyles.sectionTitle}>Fecha de inicio de la rutina</Text>
+          <Pressable
+            style={localStyles.dateButton}
+            onPress={() => setShowDatePickerStart(true)}
+          >
+            <Text style={localStyles.dateButtonText}>{formatDate(dateStart)}</Text>
+          </Pressable>
+          <DateTimePickerModal
+            isVisible={showDatePickerStart}
+            date={dateStart}
+            mode="date"
+            onConfirm={onChangeDateStart}
+            onCancel={() => setShowDatePickerStart(false)}
+            isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+          />
+
+          <Text style={localStyles.sectionTitle}>Fecha de fin de la rutina</Text>
+          <Pressable
+            style={localStyles.dateButton}
+            onPress={() => setShowDatePickerEnd(true)}
+          >
+            <Text style={localStyles.dateButtonText}>{formatDate(dateEnd)}</Text>
+          </Pressable>
+          <DateTimePickerModal
+            isVisible={showDatePickerEnd}
+            date={dateEnd}
+            mode="date"
+            onConfirm={onChangeDateEnd}
+            onCancel={() => setShowDatePickerEnd(false)}
+            isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+          />
+
+          <Text style={localStyles.sectionTitle}>Selecciona la hora del viaje:</Text>
+          <Pressable
+            style={localStyles.dateButton}
+            onPress={() => setShowTimePicker(true)}
+          >
+            <Text style={localStyles.dateButtonText}>{formatTime(timeStart)}</Text>
+          </Pressable>
+          <DateTimePickerModal
+            isVisible={showTimePicker}
+            date={timeStart}
+            mode="time"
+            onConfirm={onChangeTime}
+            onCancel={() => setShowTimePicker(false)}
+            isDarkModeEnabled={Appearance.getColorScheme() === "light"}
+          />
+        </View>
+
+        <View style={localStyles.buttonContainer}>
+          <Pressable
+            style={localStyles.continueButton}
+            onPress={handleRegistrarDistancia}
+          >
+            <Text style={localStyles.continueButtonText}>Continuar</Text>
+          </Pressable>
+        </View>
       </View>
-    </ScrollView>
+    </KeyboardAwareContainer>
   );
 }
+
+const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  infoContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  daysContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 15,
+    color: "#333",
+  },
+  description: {
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+    marginBottom: 15,
+  },
+  dateButton: {
+    backgroundColor: "#007AFF",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  dateButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  dropdown: {
+    height: 50,
+    backgroundColor: "white",
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: "#666",
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  selectedStyle: {
+    borderRadius: 8,
+    backgroundColor: "#E3F2FD",
+  },
+  buttonContainer: {
+    marginTop: 10,
+  },
+  continueButton: {
+    backgroundColor: "#007AFF",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  continueButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});

@@ -1,19 +1,12 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-  ScrollView,
-  Appearance,
-} from "react-native";
+import { View, Text, TextInput, Button, Alert, Appearance } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { styles } from "../../utils/styles";
 import { useUser } from "./UserContext";
 import { PROVINCES } from "../../utils/provinces";
+import KeyboardAwareContainer from "../../components/KeyboardAwareContainer";
 
 export default function Insertpersonaldata() {
   const [dni, setDni] = useState("");
@@ -131,7 +124,7 @@ export default function Insertpersonaldata() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <KeyboardAwareContainer>
       <Text style={styles.title}>¡Registra tu cuenta!</Text>
 
       <Text style={styles.label}>DNI</Text>
@@ -232,6 +225,6 @@ export default function Insertpersonaldata() {
       )}
 
       <Button title="Continuar" onPress={handleSignup} />
-    </ScrollView>
+    </KeyboardAwareContainer>
   );
 }

@@ -7,11 +7,14 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useAuth } from "../../AuthContext";
+import { useRouter } from "expo-router";
 import getPaymentAlias from "../../../utils/getPaymentAlias";
 import getUrl from "../../../utils/url";
 import axios from "axios";
+import KeyboardAwareContainer from "../../../components/KeyboardAwareContainer";
 
 export default function ConfigPayment() {
   const { auth } = useAuth();

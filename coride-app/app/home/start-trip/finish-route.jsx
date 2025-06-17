@@ -12,6 +12,7 @@ import { useAuth } from "../../AuthContext";
 import { useRouter } from "expo-router";
 import getUrl from "../../../utils/url";
 import axios from "axios";
+import KeyboardAwareContainer from "../../../components/KeyboardAwareContainer";
 
 const InputOpinion = ({ handleOpinion, user }) => {
   console.log("user", user);
@@ -136,7 +137,7 @@ export default function NextTrip() {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareContainer contentContainerStyle={styles.container}>
       <Text style={styles.title}>Finalizar viaje</Text>
       {trip.usersTo.map((user) => {
         console.log("user", user);
@@ -170,7 +171,7 @@ export default function NextTrip() {
       <View style={styles.buttonContainer}>
         <Button title="Finalizar viaje" onPress={handleFinalizarViaje} />
       </View>
-    </View>
+    </KeyboardAwareContainer>
   );
 }
 

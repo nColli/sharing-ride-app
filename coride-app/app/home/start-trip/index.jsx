@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   Button,
+  Pressable,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useTrip } from "./TripContext";
@@ -126,12 +127,14 @@ export default function NextTrip() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button
-          title="Iniciar viaje"
+        <Pressable
+          style={styles.startButton}
           onPress={() => {
             router.push(`/home/start-trip/start-route`);
           }}
-        />
+        >
+          <Text style={styles.startButtonText}>Iniciar viaje</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -197,7 +200,18 @@ const styles = StyleSheet.create({
     color: "#007AFF",
   },
   buttonContainer: {
-    gap: 10,
+    gap: 15,
+  },
+  startButton: {
+    backgroundColor: "#34C759",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  startButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
   info: {
     marginTop: 10,
@@ -207,12 +221,14 @@ const styles = StyleSheet.create({
   pressable: {
     backgroundColor: "#007AFF",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 8,
     marginTop: 10,
   },
   textPressable: {
     color: "white",
     textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
   },
   passengerCount: {
     fontSize: 16,

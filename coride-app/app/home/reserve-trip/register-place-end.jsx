@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, Button, Alert, ScrollView, TextInput } from "react-native";
+import { View, Text, Alert, TextInput, StyleSheet, Pressable } from "react-native";
 import { styles } from "../../../utils/styles";
 import { useReserve } from "./ReserveContext";
 import { useAuth } from "../../AuthContext";
@@ -8,8 +8,9 @@ import getURL from "../../../utils/url";
 import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
 import { PROVINCES } from "../../../utils/provinces";
+import KeyboardAwareContainer from "../../../components/KeyboardAwareContainer";
 
-export default function SelectPlaceStart() {
+export default function SelectPlaceEnd() {
   const defaultPlace = {
     name: "",
     street: "",
@@ -127,44 +128,152 @@ export default function SelectPlaceStart() {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Reserva un viaje</Text>
-        <Text style={styles.subtitle}>Elegí un punto de destino</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedRegularPlace}
-            onValueChange={(itemValue, itemIndex) => {
-              console.log("item value pick place", itemValue);
-              setSelectedRegularPlace(regularPlaces[itemIndex]);
-            }}
-          >
-            {regularPlaces.map((place, idx) => (
-              <Picker.Item key={idx} label={place.name} value={place} />
-            ))}
-          </Picker>
-        </View>
-        <Text>Calle:</Text>
-        <TextInput style={styles.input} onChangeText={handleChangeCalle} />
-        <Text>Numero:</Text>
-        <TextInput style={styles.input} onChangeText={handleChangeNumero} />
-        <Text>Localidad:</Text>
-        <TextInput style={styles.input} onChangeText={handleChangeLocalidad} />
+    <KeyboardAwareContainer>
+      <View style={localStyles.container}>
+        <Text style={localStyles.title}>Registra tu reserva</Text>
 
-        <Text style={styles.label}>Provincia</Text>
-        <View style={styles.pickerContainer}>
+        <View style={localStyles.infoContainer}>
+          <Text style={localStyles.sectionTitle}>Lugar de llegada</Text>
+          <Text style={localStyles.description}>
+            Selecciona un lugar guardado o ingresa uno nuevo
+          </Text>
+
+          <View style={localStyles.pickerContainer}>
+            <Text style={localStyles.label}>Lugares guardados:</Text>
+            <Picker
+              selectedValue={selectedRegularPlace}
+              onValueChange={(itemValue) => setSelectedRegularPlace(itemValue)}
+              style={localStyles.picker}
+            >
+              {regularPlaces.map((place, index) => (
+                <Picker.Item
+                  label={`${place.name} - ${place.street} ${place.number}, ${place.city}`}
+                  value={place}
+                  key={index}
+                />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={localStyles.label}>O ingresa un nuevo lugar:</Text>
+          <TextInput
+            style={localStyles.input}
+            placeholder="Calle"
+            value={place.street}
+            onChangeText={handleChangeCalle}
+          />
+          <TextInput
+            style={localStyles.input}
+            placeholder="Número"
+            value={place.number}
+            onChangeText={handleChangeNumero}
+          />
+          <TextInput
+            style={localStyles.input}
+            placeholder="Localidad"
+            value={place.city}
+            onChangeText={handleChangeLocalidad}
+          />
           <Picker
-            selectedValue={place["province"]}
+            selectedValue={place.province}
             onValueChange={handleChangeProvincia}
+            style={localStyles.picker}
           >
-            <Picker.Item label="Seleccione una provincia" value="" />
-            {PROVINCES.map((prov) => (
-              <Picker.Item key={prov} label={prov} value={prov} />
+            {PROVINCES.map((province, index) => (
+              <Picker.Item
+                label={province}
+                value={province}
+                key={index}
+              />
             ))}
           </Picker>
         </View>
-        <Button title="Continuar" onPress={handleContinuar} />
+
+        <View style={localStyles.buttonContainer}>
+          <Pressable
+            style={localStyles.continueButton}
+            onPress={handleContinuar}
+          >
+            <Text style={localStyles.continueButtonText}>Continuar</Text>
+          </Pressable>
+        </View>
       </View>
-    </ScrollView>
+    </KeyboardAwareContainer>
   );
 }
+
+const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  infoContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+    color: "#333",
+  },
+  description: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 15,
+    lineHeight: 20,
+  },
+  pickerContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 8,
+    color: "#333",
+  },
+  picker: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  input: {
+    backgroundColor: "#f8f8f8",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  buttonContainer: {
+    marginTop: 10,
+  },
+  continueButton: {
+    backgroundColor: "#007AFF",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  continueButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});

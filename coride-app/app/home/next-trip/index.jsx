@@ -178,27 +178,34 @@ export default function NextTrip() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button
-          title="Acceder al chat"
+        <Pressable
+          style={styles.chatButton}
           onPress={() => {
             const tripId = isDriver ? trip._id : reserve.trip;
             router.push(`/home/chat/${tripId}`);
           }}
-        />
-        <Button
-          title="Eliminar viaje"
-          color="#FF3B30"
+        >
+          <Text style={styles.chatButtonText}>Acceder al chat</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.deleteButton}
           onPress={() => {
             const tripId = isDriver ? trip._id : reserve.trip;
             router.push(`/home/delete-trip/${tripId}`);
           }}
-        />
-        <Button
-          title="Volver"
+        >
+          <Text style={styles.deleteButtonText}>Eliminar viaje</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.backButton}
           onPress={() => {
             router.push("/home");
           }}
-        />
+        >
+          <Text style={styles.backButtonText}>Volver</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -264,7 +271,7 @@ const styles = StyleSheet.create({
     color: "#007AFF",
   },
   buttonContainer: {
-    gap: 10,
+    gap: 15,
   },
   info: {
     marginTop: 10,
@@ -274,12 +281,47 @@ const styles = StyleSheet.create({
   pressable: {
     backgroundColor: "#007AFF",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 8,
     marginTop: 10,
   },
   textPressable: {
     color: "white",
     textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  chatButton: {
+    backgroundColor: "#007AFF",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  chatButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  deleteButton: {
+    backgroundColor: "#FF3B30",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  deleteButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  backButton: {
+    backgroundColor: "#8E8E93",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  backButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
   passengerCount: {
     marginTop: 2,

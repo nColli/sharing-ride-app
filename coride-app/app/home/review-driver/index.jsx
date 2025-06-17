@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import getUrl from "../../../utils/url";
 import axios from "axios";
 import getPendingReview from "../../../utils/getPendingReview";
+import KeyboardAwareContainer from "../../../components/KeyboardAwareContainer";
 
 const InputOpinion = ({ handleOpinion, driver, reserve }) => {
   const textPlace = (place) => {
@@ -135,7 +136,7 @@ export default function NextTrip() {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareContainer contentContainerStyle={styles.container}>
       <Text style={styles.title}>Evaluar conductor</Text>
       <InputOpinion
         driver={driver}
@@ -146,7 +147,7 @@ export default function NextTrip() {
       <View style={styles.buttonContainer}>
         <Button title="Evaluar conductor" onPress={handleReviewDriver} />
       </View>
-    </View>
+    </KeyboardAwareContainer>
   );
 }
 

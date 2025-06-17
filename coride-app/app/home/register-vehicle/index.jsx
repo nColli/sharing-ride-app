@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  ScrollView,
   View,
   Text,
   TextInput,
@@ -18,6 +17,7 @@ import getUrl from "../../../utils/url";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import useLoading from "../../../custom_hooks/useLoading";
 import { useAuth } from "../../AuthContext";
+import KeyboardAwareContainer from "../../../components/KeyboardAwareContainer";
 
 const PhotoUpload = ({ label, photo, onPhotoChange }) => {
   const handleTakePhoto = async () => {
@@ -161,7 +161,7 @@ export default function VehicleRegistration() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <KeyboardAwareContainer contentContainerStyle={styles.container}>
       <Text style={styles.title}>Registrar vehículo</Text>
 
       {Object.keys(formData).map((field) => (
@@ -207,7 +207,7 @@ export default function VehicleRegistration() {
 
         <LoadingOverlay visible={isLoading} />
       </View>
-    </ScrollView>
+    </KeyboardAwareContainer>
   );
 }
 

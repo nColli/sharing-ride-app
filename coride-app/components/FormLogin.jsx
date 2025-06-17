@@ -1,4 +1,4 @@
-import { Alert, Button, View } from "react-native";
+import { Alert, Button, View, StyleSheet, Pressable, Text } from "react-native";
 import InputEmail from "./InputEmail";
 import InputPassword from "./InputPassword";
 import ErrorText from "./ErrorText";
@@ -89,11 +89,30 @@ export default function FormLogin() {
 
       <ErrorText error={loginError} />
 
-      <View style={styles.button}>
-        <Button title="Iniciar Sesión" onPress={handleLogin} />
+      <View style={localStyles.buttonContainer}>
+        <Pressable style={localStyles.loginButton} onPress={handleLogin}>
+          <Text style={localStyles.loginButtonText}>Iniciar Sesión</Text>
+        </Pressable>
       </View>
 
       <LoadingOverlay visible={isLoading} />
     </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  buttonContainer: {
+    marginTop: 20,
+  },
+  loginButton: {
+    backgroundColor: "#007AFF",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  loginButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
